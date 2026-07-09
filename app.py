@@ -1,3 +1,6 @@
+# consulate_report_app.py
+# Reporte de Atenciones - Consulado (con fondos claros forzados)
+
 import streamlit as st
 import pandas as pd
 import smtplib
@@ -16,18 +19,15 @@ import requests
 SMTP_SERVER = "smtp.office365.com"
 SMTP_PORT = 587
 
-# URL del logo en GitHub (CAMBIA POR TU URL)
 URL_LOGO_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/logo.png"
 URL_BANNER_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/banner.png"
 
-# Datos de contacto
 NOMBRE_EMPRESA = "Community Law Group, PLLC® "
 DEPARTAMENTO = "Quality Control & Efficiency Department"
 TELEFONO = "+1 (615) 913-5576"
 EMAIL_CONTACTO = "executiveassistant2@communitylawgroup.com"
 SITIO_WEB = "www.communitylawgroup.com"
 
-# Destinatarios
 DEFAULT_TO = ["consnashville@minex.gob.gt"]
 DEFAULT_CC = ["lsillescas@minex.gob.gt", "dataprojects@communitylawgroup.com", 
               "executiveassistant2@communitylawgroup.com", "data.analyst7@communitylawgroup.com"]
@@ -420,7 +420,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# INTERFAZ STREAMLIT - CON FONDOS CLAROS
+# INTERFAZ STREAMLIT - CON FONDOS CLAROS FORZADOS
 # ============================================================
 
 st.set_page_config(
@@ -431,26 +431,23 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS PARA FORZAR TODOS LOS FONDOS CLAROS
+# CSS PARA FORZAR TODOS LOS FONDOS CLAROS (IGNORA MODO OSCURO)
 # ============================================================
 
 st.markdown("""
 <style>
-    /* Ocultar elementos de Streamlit */
-    #MainMenu { visibility: hidden; }
-    footer { visibility: hidden; }
-    
     /* ============================================================
-       FONDO GENERAL - CLARO
+       FORZAR TODOS LOS FONDOS A CLARO
        ============================================================ */
     
-    .stApp {
+    /* Fuerza el tema claro en todo el documento */
+    .stApp, .stApp > div, .main, .main > div, .block-container {
         background-color: #e8edf2 !important;
     }
     
-    /* Contenedor principal */
-    .main > div {
-        background-color: #e8edf2 !important;
+    /* Fuerza todos los elementos a fondo claro */
+    div, section, header, footer, nav, aside, main, article {
+        background-color: transparent !important;
     }
     
     /* ============================================================
@@ -462,7 +459,7 @@ st.markdown("""
         border-right: 2px solid #1a4a7a !important;
     }
     
-    section[data-testid="stSidebar"] .css-1d391kg {
+    section[data-testid="stSidebar"] > div {
         background-color: #f0f4f8 !important;
     }
     
@@ -633,10 +630,10 @@ st.markdown("""
     .animate-delay-3 { animation-delay: 0.3s; }
     
     /* ============================================================
-       TARJETAS - FONDO CLARO
+       TARJETAS - FONDO CLARO FORZADO
        ============================================================ */
     
-    .card {
+    .card, div[data-testid="stExpander"], div[data-testid="stExpander"] > div {
         background-color: #ffffff !important;
         border-radius: 14px;
         padding: 22px 26px;
@@ -657,10 +654,10 @@ st.markdown("""
     }
     
     /* ============================================================
-       MÉTRICAS - FONDO CLARO
+       MÉTRICAS - FONDO CLARO FORZADO
        ============================================================ */
     
-    .metric-container {
+    .metric-container, div[data-testid="stMetric"] {
         background-color: #ffffff !important;
         border-radius: 12px;
         padding: 18px 16px;
@@ -697,7 +694,7 @@ st.markdown("""
     }
     
     /* ============================================================
-       EXPANDER - FONDO CLARO
+       EXPANDER - FONDO CLARO FORZADO
        ============================================================ */
     
     .streamlit-expanderHeader {
@@ -717,18 +714,14 @@ st.markdown("""
     }
     
     /* ============================================================
-       DATA FRAME - FONDO CLARO
+       DATA FRAME - FONDO CLARO FORZADO
        ============================================================ */
     
-    .stDataFrame {
+    .stDataFrame, .stDataFrame > div, .stDataFrame table {
         background-color: #ffffff !important;
         border-radius: 10px !important;
         overflow: hidden !important;
         border: 1px solid #e8edf2 !important;
-    }
-    
-    .stDataFrame table {
-        background-color: #ffffff !important;
     }
     
     .stDataFrame th {
@@ -739,6 +732,21 @@ st.markdown("""
     .stDataFrame td {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
+    }
+    
+    /* ============================================================
+       FILE UPLOADER - FONDO CLARO FORZADO
+       ============================================================ */
+    
+    .stFileUploader > div {
+        background-color: #ffffff !important;
+        border: 2px dashed #c8d0d8 !important;
+        border-radius: 10px !important;
+        padding: 20px !important;
+    }
+    
+    .stFileUploader > div:hover {
+        border-color: #1a4a7a !important;
     }
     
     /* ============================================================
@@ -871,6 +879,21 @@ st.markdown("""
     .stAlert > div {
         color: #1a2a3a !important;
     }
+    
+    /* ============================================================
+       FORZAR COLOR DE TEXTO EN TODOS LADOS
+       ============================================================ */
+    
+    * {
+        color: #1a2a3a !important;
+    }
+    
+    /* Excepción: textos que deben ser blancos */
+    .stButton > button, .stButton > button *, 
+    section[data-testid="stSidebar"] .stButton > button,
+    section[data-testid="stSidebar"] .stButton > button * {
+        color: white !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -913,7 +936,7 @@ else:
     """, unsafe_allow_html=True)
 
 # ============================================================
-# SIDEBAR - CLARA Y LEGIBLE
+# SIDEBAR
 # ============================================================
 
 with st.sidebar:
