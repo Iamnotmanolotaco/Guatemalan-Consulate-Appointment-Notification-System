@@ -441,7 +441,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# INTERFAZ STREAMLIT - MODO CLARO FORZADO
+# CONFIGURACIÓN DE PÁGINA
 # ============================================================
 
 st.set_page_config(
@@ -452,27 +452,21 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - MODO CLARO FORZADO (BARRA LATERAL AZUL CLARO)
+# CSS - MODO CLARO FORZADO
 # ============================================================
 
 st.markdown("""
 <style>
-    /* ============================================================
-       OCULTAR ELEMENTOS
-       ============================================================ */
+    /* Ocultar elementos */
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
-    /* ============================================================
-       FONDO GENERAL - CLARO
-       ============================================================ */
+    /* Fondo general */
     .stApp, .stApp > div, .main, .main > div, .block-container {
         background-color: #e8edf2 !important;
     }
     
-    /* ============================================================
-       BARRA LATERAL - AZUL CLARO (como en los correos)
-       ============================================================ */
+    /* BARRA LATERAL - AZUL CLARO */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #f0f4f8, #d5dde6) !important;
         border-right: 2px solid #1a4a7a !important;
@@ -482,9 +476,7 @@ st.markdown("""
         background-color: transparent !important;
     }
     
-    /* ============================================================
-       TEXTOS EN LA BARRA LATERAL - OSCUROS (como en el correo)
-       ============================================================ */
+    /* TEXTOS EN LA BARRA LATERAL - OSCUROS */
     section[data-testid="stSidebar"] *,
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] .stText,
@@ -495,14 +487,12 @@ st.markdown("""
     section[data-testid="stSidebar"] span,
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {{
+    section[data-testid="stSidebar"] h3 {
         color: #1a2a3a !important;
-    }}
+    }
     
-    /* ============================================================
-       INPUTS EN BARRA LATERAL - FONDO BLANCO, TEXTO OSCURO
-       ============================================================ */
-    section[data-testid="stSidebar"] .stTextInput > div > div > input {{
+    /* INPUTS EN BARRA LATERAL */
+    section[data-testid="stSidebar"] .stTextInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
         border-color: #c8d0d8 !important;
@@ -510,149 +500,143 @@ st.markdown("""
         padding: 10px 14px !important;
         font-size: 14px !important;
         font-weight: 500 !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {{
+    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
         color: #8a9bb0 !important;
         opacity: 0.7 !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stTextInput > div > div > input:focus {{
+    section[data-testid="stSidebar"] .stTextInput > div > div > input:focus {
         border-color: #1a4a7a !important;
         box-shadow: 0 0 20px rgba(26, 74, 122, 0.15) !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stTextArea > div > div > textarea {{
+    section[data-testid="stSidebar"] .stTextArea > div > div > textarea {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
         border-color: #c8d0d8 !important;
         border-radius: 8px !important;
         font-size: 14px !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stFileUploader > div > button {{
+    section[data-testid="stSidebar"] .stFileUploader > div > button {
         background-color: #1a4a7a !important;
         color: white !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
         border: none !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stFileUploader > div > button:hover {{
+    section[data-testid="stSidebar"] .stFileUploader > div > button:hover {
         background-color: #0d2a4a !important;
         color: white !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stCheckbox label {{
+    section[data-testid="stSidebar"] .stCheckbox label {
         color: #1a2a3a !important;
         font-weight: 600 !important;
         font-size: 14px !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stButton > button {{
+    section[data-testid="stSidebar"] .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
         font-size: 15px !important;
         padding: 10px 16px !important;
         transition: all 0.3s ease !important;
         border: none !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stButton > button:first-child {{
+    section[data-testid="stSidebar"] .stButton > button:first-child {
         background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
         color: white !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stButton > button:first-child:hover {{
+    section[data-testid="stSidebar"] .stButton > button:first-child:hover {
         transform: translateY(-3px) !important;
         box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stButton > button:last-child {{
+    section[data-testid="stSidebar"] .stButton > button:last-child {
         background: rgba(26, 74, 122, 0.08) !important;
         color: #1a2a3a !important;
         border: 1px solid rgba(26, 74, 122, 0.15) !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stButton > button:last-child:hover {{
+    section[data-testid="stSidebar"] .stButton > button:last-child:hover {
         background: rgba(26, 74, 122, 0.15) !important;
         transform: translateY(-3px) !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] .stCaption {{
+    section[data-testid="stSidebar"] .stCaption {
         color: #4a5a6a !important;
         font-size: 11px !important;
         font-weight: 500 !important;
-    }}
+    }
     
-    section[data-testid="stSidebar"] hr {{
+    section[data-testid="stSidebar"] hr {
         border-color: #d5dde6 !important;
         margin: 12px 0 !important;
         opacity: 0.5 !important;
-    }}
+    }
     
-    /* ============================================================
-       TÍTULO DE LA BARRA LATERAL - OSCURO
-       ============================================================ */
-    .sidebar-title {{
+    /* TÍTULO DE LA BARRA LATERAL */
+    .sidebar-title {
         text-align: center;
         padding: 16px 0 12px 0;
         border-bottom: 2px solid #1a4a7a;
         margin-bottom: 16px;
-    }}
+    }
     
-    .sidebar-title .main {{
+    .sidebar-title .main {
         font-weight: 800;
         color: #1a3a5c;
         font-size: 24px;
         letter-spacing: -0.3px;
-    }}
+    }
     
-    .sidebar-title .sub {{
+    .sidebar-title .sub {
         font-size: 12px;
         color: #4a5a6a;
         letter-spacing: 1.5px;
         font-weight: 600;
-    }}
+    }
     
-    /* ============================================================
-       SECCIONES DE LA BARRA LATERAL
-       ============================================================ */
-    .sidebar-section {{
+    /* SECCIONES DE LA BARRA LATERAL */
+    .sidebar-section {
         background: rgba(26, 74, 122, 0.05);
         border-radius: 10px;
         padding: 12px 16px;
         margin-bottom: 12px;
         border: 1px solid rgba(26, 74, 122, 0.08);
         transition: all 0.3s ease;
-    }}
+    }
     
-    .sidebar-section:hover {{
+    .sidebar-section:hover {
         background: rgba(26, 74, 122, 0.10);
         border-color: #1a4a7a;
         transform: translateX(4px);
-    }}
+    }
     
-    .sidebar-section .icon {{
+    .sidebar-section .icon {
         font-size: 18px;
         margin-right: 8px;
-    }}
+    }
     
-    .sidebar-section .label {{
+    .sidebar-section .label {
         font-weight: 700;
         color: #1a2a3a !important;
         font-size: 14px;
-    }}
+    }
     
-    .sidebar-section .desc {{
+    .sidebar-section .desc {
         font-size: 12px;
         color: #4a5a6a !important;
         margin-top: 2px;
-    }}
+    }
     
-    /* ============================================================
-       ANIMACIONES
-       ============================================================ */
+    /* ANIMACIONES */
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
@@ -664,9 +648,7 @@ st.markdown("""
     .animate-delay-3 { animation-delay: 0.3s; }
     .animate-delay-4 { animation-delay: 0.4s; }
     
-    /* ============================================================
-       TARJETAS - FONDO BLANCO
-       ============================================================ */
+    /* TARJETAS */
     .card {
         background-color: #ffffff !important;
         border-radius: 14px;
@@ -683,13 +665,7 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(0,0,0,0.08) !important;
     }
     
-    .card * {
-        color: #1a2a3a !important;
-    }
-    
-    /* ============================================================
-       MÉTRICAS - FONDO BLANCO
-       ============================================================ */
+    /* MÉTRICAS */
     .metric-container {
         background-color: #ffffff !important;
         border-radius: 12px;
@@ -746,9 +722,7 @@ st.markdown("""
     .metric-purple .metric-label { color: #6c3483 !important; }
     .metric-purple { border-color: #6c3483 !important; }
     
-    /* ============================================================
-       EXPANDER - FONDO BLANCO
-       ============================================================ */
+    /* EXPANDER */
     .streamlit-expanderHeader {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -765,9 +739,7 @@ st.markdown("""
         border-radius: 0 0 8px 8px !important;
     }
     
-    /* ============================================================
-       DATA FRAME - FONDO BLANCO
-       ============================================================ */
+    /* DATA FRAME */
     .stDataFrame, .stDataFrame > div, .stDataFrame table {
         background-color: #ffffff !important;
         border-radius: 10px !important;
@@ -785,9 +757,7 @@ st.markdown("""
         color: #1a2a3a !important;
     }
     
-    /* ============================================================
-       RESULTADOS
-       ============================================================ */
+    /* RESULTADOS */
     .result-success {
         background-color: #eafaf1 !important;
         border-left: 6px solid #27ae60 !important;
@@ -824,9 +794,7 @@ st.markdown("""
         animation: fadeInUp 0.4s ease-out;
     }
     
-    /* ============================================================
-       BOTONES EN ÁREA PRINCIPAL
-       ============================================================ */
+    /* BOTONES */
     .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -843,9 +811,7 @@ st.markdown("""
         box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
     }
     
-    /* ============================================================
-       RADIO BUTTONS
-       ============================================================ */
+    /* RADIO BUTTONS */
     .stRadio > div {
         background-color: #ffffff !important;
         padding: 10px 16px !important;
@@ -858,9 +824,7 @@ st.markdown("""
         font-weight: 500 !important;
     }
     
-    /* ============================================================
-       NUMBER INPUT
-       ============================================================ */
+    /* NUMBER INPUT */
     .stNumberInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -868,9 +832,7 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
-    /* ============================================================
-       FOOTER
-       ============================================================ */
+    /* FOOTER */
     .footer {
         text-align: center;
         padding: 20px;
@@ -880,9 +842,7 @@ st.markdown("""
         margin-top: 30px;
     }
     
-    /* ============================================================
-       TEXTOS GENERALES
-       ============================================================ */
+    /* TEXTOS GENERALES */
     h1, h2, h3, h4, h5, h6 {
         color: #1a2a3a !important;
         font-weight: 700 !important;
@@ -1134,12 +1094,17 @@ if uploaded_file is not None:
         else:
             with st.spinner("⏳ Procesando reporte..."):
                 tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
+                
+                # ============================================================
+                # LLAMADA CORRECTA A LA FUNCIÓN
+                # ============================================================
                 success, msg = procesar_reporte(
                     uploaded_file, tipo, fecha_params,
                     smtp_username, smtp_password,
                     to_emails, cc_emails,
                     test_mode
                 )
+                # ============================================================
             
             st.markdown("---")
             st.markdown(f"<div style='font-weight: 700; color: #1a2a3a; font-size: 20px;'>📋 Resultados</div>", unsafe_allow_html=True)
