@@ -457,16 +457,13 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* Ocultar elementos */
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
-    /* Fondo general */
     .stApp, .stApp > div, .main, .main > div, .block-container {
         background-color: #e8edf2 !important;
     }
     
-    /* BARRA LATERAL - AZUL CLARO */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #f0f4f8, #d5dde6) !important;
         border-right: 2px solid #1a4a7a !important;
@@ -476,7 +473,6 @@ st.markdown("""
         background-color: transparent !important;
     }
     
-    /* TEXTOS EN LA BARRA LATERAL - OSCUROS */
     section[data-testid="stSidebar"] *,
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] .stText,
@@ -491,7 +487,6 @@ st.markdown("""
         color: #1a2a3a !important;
     }
     
-    /* INPUTS EN BARRA LATERAL */
     section[data-testid="stSidebar"] .stTextInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -581,7 +576,6 @@ st.markdown("""
         opacity: 0.5 !important;
     }
     
-    /* TÍTULO DE LA BARRA LATERAL */
     .sidebar-title {
         text-align: center;
         padding: 16px 0 12px 0;
@@ -603,7 +597,6 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* SECCIONES DE LA BARRA LATERAL */
     .sidebar-section {
         background: rgba(26, 74, 122, 0.05);
         border-radius: 10px;
@@ -636,7 +629,6 @@ st.markdown("""
         margin-top: 2px;
     }
     
-    /* ANIMACIONES */
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
@@ -648,24 +640,6 @@ st.markdown("""
     .animate-delay-3 { animation-delay: 0.3s; }
     .animate-delay-4 { animation-delay: 0.4s; }
     
-    /* TARJETAS */
-    .card {
-        background-color: #ffffff !important;
-        border-radius: 14px;
-        padding: 22px 26px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
-        border: 1px solid #e8edf2 !important;
-        margin-bottom: 16px;
-        animation: fadeInUp 0.5s ease-out;
-        transition: all 0.3s ease;
-    }
-    
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08) !important;
-    }
-    
-    /* MÉTRICAS */
     .metric-container {
         background-color: #ffffff !important;
         border-radius: 12px;
@@ -722,7 +696,6 @@ st.markdown("""
     .metric-purple .metric-label { color: #6c3483 !important; }
     .metric-purple { border-color: #6c3483 !important; }
     
-    /* EXPANDER */
     .streamlit-expanderHeader {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -739,7 +712,6 @@ st.markdown("""
         border-radius: 0 0 8px 8px !important;
     }
     
-    /* DATA FRAME */
     .stDataFrame, .stDataFrame > div, .stDataFrame table {
         background-color: #ffffff !important;
         border-radius: 10px !important;
@@ -757,7 +729,6 @@ st.markdown("""
         color: #1a2a3a !important;
     }
     
-    /* RESULTADOS */
     .result-success {
         background-color: #eafaf1 !important;
         border-left: 6px solid #27ae60 !important;
@@ -794,7 +765,6 @@ st.markdown("""
         animation: fadeInUp 0.4s ease-out;
     }
     
-    /* BOTONES */
     .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -811,7 +781,6 @@ st.markdown("""
         box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
     }
     
-    /* RADIO BUTTONS */
     .stRadio > div {
         background-color: #ffffff !important;
         padding: 10px 16px !important;
@@ -824,7 +793,6 @@ st.markdown("""
         font-weight: 500 !important;
     }
     
-    /* NUMBER INPUT */
     .stNumberInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -832,7 +800,6 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
-    /* FOOTER */
     .footer {
         text-align: center;
         padding: 20px;
@@ -842,7 +809,6 @@ st.markdown("""
         margin-top: 30px;
     }
     
-    /* TEXTOS GENERALES */
     h1, h2, h3, h4, h5, h6 {
         color: #1a2a3a !important;
         font-weight: 700 !important;
@@ -1092,31 +1058,36 @@ if uploaded_file is not None:
         if enviar_reales and (not smtp_username or not smtp_password):
             st.error("⚠️ Ingresa tus credenciales de Outlook para enviar correos reales")
         else:
-            with st.spinner("⏳ Procesando reporte..."):
-                tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
-                
-                # ============================================================
-                # LLAMADA CORRECTA A LA FUNCIÓN
-                # ============================================================
-                success, msg = procesar_reporte(
-                    uploaded_file, tipo, fecha_params,
-                    smtp_username, smtp_password,
-                    to_emails, cc_emails,
-                    test_mode
-                )
-                # ============================================================
+            # ============================================================
+            # PROCESAR DESTINATARIOS ANTES DE LLAMAR A LA FUNCIÓN
+            # ============================================================
+            to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
+            cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
             
-            st.markdown("---")
-            st.markdown(f"<div style='font-weight: 700; color: #1a2a3a; font-size: 20px;'>📋 Resultados</div>", unsafe_allow_html=True)
-            
-            if success:
-                st.success(msg)
-                if test_mode:
-                    st.info("🔬 Modo prueba activo: El correo se envió solo a tu cuenta")
-                else:
-                    st.balloons()
+            if not to_emails:
+                st.error("❌ Debes especificar al menos un destinatario")
             else:
-                st.error(msg)
+                with st.spinner("⏳ Procesando reporte..."):
+                    tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
+                    
+                    success, msg = procesar_reporte(
+                        uploaded_file, tipo, fecha_params,
+                        smtp_username, smtp_password,
+                        to_emails, cc_emails,
+                        test_mode
+                    )
+                
+                st.markdown("---")
+                st.markdown(f"<div style='font-weight: 700; color: #1a2a3a; font-size: 20px;'>📋 Resultados</div>", unsafe_allow_html=True)
+                
+                if success:
+                    st.success(msg)
+                    if test_mode:
+                        st.info("🔬 Modo prueba activo: El correo se envió solo a tu cuenta")
+                    else:
+                        st.balloons()
+                else:
+                    st.error(msg)
 
 else:
     st.markdown("""
