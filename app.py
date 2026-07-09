@@ -1016,23 +1016,23 @@ if uploaded_file is not None:
         st.dataframe(df.head(10), use_container_width=True)
     
     # ============================================================
-    # SELECCIÓN DE PERÍODO
+    # SELECCIÓN DE PERÍODO - CORREGIDO
     # ============================================================
     st.subheader("📅 Seleccionar período")
     
     tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
     
-    # Inicializar fecha_params
+    # Inicializar fecha_params fuera de los condicionales
     fecha_params = {}
     
     if tipo_reporte == "Día específico":
         col_dia1, col_dia2, col_dia3 = st.columns(3)
         with col_dia1:
-            dia = st.number_input("Día", min_value=1, max_value=31, value=1)
+            dia = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_specific")
         with col_dia2:
-            mes = st.number_input("Mes", min_value=1, max_value=12, value=1)
+            mes = st.number_input("Mes", min_value=1, max_value=12, value=1, key="mes_specific")
         with col_dia3:
-            año = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year)
+            año = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year, key="año_specific")
         
         fecha_params = {'dia': dia, 'mes': mes, 'año': año}
         
@@ -1040,24 +1040,28 @@ if uploaded_file is not None:
         st.markdown("**Fecha de inicio:**")
         col_ini1, col_ini2, col_ini3 = st.columns(3)
         with col_ini1:
-            dia_ini = st.number_input("Día inicio", min_value=1, max_value=31, value=1)
+            dia_ini = st.number_input("Día inicio", min_value=1, max_value=31, value=1, key="dia_ini")
         with col_ini2:
-            mes_ini = st.number_input("Mes inicio", min_value=1, max_value=12, value=1)
+            mes_ini = st.number_input("Mes inicio", min_value=1, max_value=12, value=1, key="mes_ini")
         with col_ini3:
-            año_ini = st.number_input("Año inicio", min_value=2000, max_value=2100, value=datetime.now().year)
+            año_ini = st.number_input("Año inicio", min_value=2000, max_value=2100, value=datetime.now().year, key="año_ini")
         
         st.markdown("**Fecha de fin:**")
         col_fin1, col_fin2, col_fin3 = st.columns(3)
         with col_fin1:
-            dia_fin = st.number_input("Día fin", min_value=1, max_value=31, value=1)
+            dia_fin = st.number_input("Día fin", min_value=1, max_value=31, value=1, key="dia_fin")
         with col_fin2:
-            mes_fin = st.number_input("Mes fin", min_value=1, max_value=12, value=1)
+            mes_fin = st.number_input("Mes fin", min_value=1, max_value=12, value=1, key="mes_fin")
         with col_fin3:
-            año_fin = st.number_input("Año fin", min_value=2000, max_value=2100, value=datetime.now().year)
+            año_fin = st.number_input("Año fin", min_value=2000, max_value=2100, value=datetime.now().year, key="año_fin")
         
         fecha_params = {
-            'dia_ini': dia_ini, 'mes_ini': mes_ini, 'año_ini': año_ini,
-            'dia_fin': dia_fin, 'mes_fin': mes_fin, 'año_fin': año_fin
+            'dia_ini': dia_ini,
+            'mes_ini': mes_ini,
+            'año_ini': año_ini,
+            'dia_fin': dia_fin,
+            'mes_fin': mes_fin,
+            'año_fin': año_fin
         }
     
     # ============================================================
