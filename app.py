@@ -1015,9 +1015,15 @@ if uploaded_file is not None:
     with st.expander("👁️ Vista previa de datos"):
         st.dataframe(df.head(10), use_container_width=True)
     
+    # ============================================================
+    # SELECCIÓN DE PERÍODO
+    # ============================================================
     st.subheader("📅 Seleccionar período")
     
     tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
+    
+    # Inicializar fecha_params
+    fecha_params = {}
     
     if tipo_reporte == "Día específico":
         col_dia1, col_dia2, col_dia3 = st.columns(3)
@@ -1030,7 +1036,7 @@ if uploaded_file is not None:
         
         fecha_params = {'dia': dia, 'mes': mes, 'año': año}
         
-    else:
+    else:  # Rango de fechas
         st.markdown("**Fecha de inicio:**")
         col_ini1, col_ini2, col_ini3 = st.columns(3)
         with col_ini1:
@@ -1054,13 +1060,14 @@ if uploaded_file is not None:
             'dia_fin': dia_fin, 'mes_fin': mes_fin, 'año_fin': año_fin
         }
     
+    # ============================================================
+    # PROCESAR ENVÍO
+    # ============================================================
     if enviar_reales or simular:
         if enviar_reales and (not smtp_username or not smtp_password):
             st.error("⚠️ Ingresa tus credenciales de Outlook para enviar correos reales")
         else:
-            # ============================================================
-            # PROCESAR DESTINATARIOS ANTES DE LLAMAR A LA FUNCIÓN
-            # ============================================================
+            # Procesar destinatarios
             to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
             cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
             
