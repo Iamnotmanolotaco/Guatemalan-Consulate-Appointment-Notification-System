@@ -1,6 +1,3 @@
-# consulate_report_app.py
-# Reporte de Atenciones - Consulado (con fondos claros forzados)
-
 import streamlit as st
 import pandas as pd
 import smtplib
@@ -420,7 +417,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# INTERFAZ STREAMLIT - CON FONDOS CLAROS FORZADOS
+# CONFIGURACIÓN DE PÁGINA
 # ============================================================
 
 st.set_page_config(
@@ -431,29 +428,27 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS PARA FORZAR TODOS LOS FONDOS CLAROS (IGNORA MODO OSCURO)
+# CSS FORZADO A CLARO
 # ============================================================
 
 st.markdown("""
 <style>
     /* ============================================================
+       OCULTAR ELEMENTOS
+       ============================================================ */
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+    
+    /* ============================================================
        FORZAR TODOS LOS FONDOS A CLARO
        ============================================================ */
-    
-    /* Fuerza el tema claro en todo el documento */
     .stApp, .stApp > div, .main, .main > div, .block-container {
         background-color: #e8edf2 !important;
-    }
-    
-    /* Fuerza todos los elementos a fondo claro */
-    div, section, header, footer, nav, aside, main, article {
-        background-color: transparent !important;
     }
     
     /* ============================================================
        BARRA LATERAL - CLARA
        ============================================================ */
-    
     section[data-testid="stSidebar"] {
         background-color: #f0f4f8 !important;
         border-right: 2px solid #1a4a7a !important;
@@ -506,20 +501,6 @@ st.markdown("""
         font-size: 14px !important;
     }
     
-    section[data-testid="stSidebar"] .stFileUploader > div > button {
-        background-color: #ffffff !important;
-        color: #1a2a3a !important;
-        border-color: #c8d0d8 !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-    }
-    
-    section[data-testid="stSidebar"] .stFileUploader > div > button:hover {
-        background-color: #1a4a7a !important;
-        color: white !important;
-        border-color: #1a4a7a !important;
-    }
-    
     section[data-testid="stSidebar"] .stCheckbox label {
         color: #1a2a3a !important;
         font-weight: 600 !important;
@@ -557,7 +538,6 @@ st.markdown("""
     /* ============================================================
        TÍTULO DE LA BARRA LATERAL
        ============================================================ */
-    
     .sidebar-title {
         text-align: center;
         padding: 16px 0 12px 0;
@@ -582,7 +562,6 @@ st.markdown("""
     /* ============================================================
        SECCIONES DE LA BARRA LATERAL
        ============================================================ */
-    
     .sidebar-section {
         background: rgba(26, 74, 122, 0.06) !important;
         border-radius: 10px;
@@ -618,7 +597,6 @@ st.markdown("""
     /* ============================================================
        ANIMACIONES
        ============================================================ */
-    
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
@@ -630,10 +608,47 @@ st.markdown("""
     .animate-delay-3 { animation-delay: 0.3s; }
     
     /* ============================================================
-       TARJETAS - FONDO CLARO FORZADO
+       FILE UPLOADER - FORZADO A CLARO (BOTÓN)
        ============================================================ */
+    .stFileUploader > div {
+        background-color: #ffffff !important;
+        border: 2px dashed #c8d0d8 !important;
+        border-radius: 10px !important;
+        padding: 20px !important;
+    }
     
-    .card, div[data-testid="stExpander"], div[data-testid="stExpander"] > div {
+    .stFileUploader > div:hover {
+        border-color: #1a4a7a !important;
+    }
+    
+    .stFileUploader > div > button {
+        background-color: #1a4a7a !important;
+        color: white !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        border: none !important;
+        padding: 8px 20px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stFileUploader > div > button:hover {
+        background-color: #0d2a4a !important;
+        transform: scale(1.02) !important;
+    }
+    
+    /* Texto del file uploader */
+    .stFileUploader > div > div {
+        color: #1a2a3a !important;
+    }
+    
+    .stFileUploader > div > small {
+        color: #4a5a6a !important;
+    }
+    
+    /* ============================================================
+       TARJETAS - FONDO CLARO
+       ============================================================ */
+    .card {
         background-color: #ffffff !important;
         border-radius: 14px;
         padding: 22px 26px;
@@ -654,10 +669,9 @@ st.markdown("""
     }
     
     /* ============================================================
-       MÉTRICAS - FONDO CLARO FORZADO
+       MÉTRICAS - FONDO CLARO
        ============================================================ */
-    
-    .metric-container, div[data-testid="stMetric"] {
+    .metric-container {
         background-color: #ffffff !important;
         border-radius: 12px;
         padding: 18px 16px;
@@ -694,9 +708,8 @@ st.markdown("""
     }
     
     /* ============================================================
-       EXPANDER - FONDO CLARO FORZADO
+       EXPANDER - FONDO CLARO
        ============================================================ */
-    
     .streamlit-expanderHeader {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -714,9 +727,8 @@ st.markdown("""
     }
     
     /* ============================================================
-       DATA FRAME - FONDO CLARO FORZADO
+       DATA FRAME - FONDO CLARO
        ============================================================ */
-    
     .stDataFrame, .stDataFrame > div, .stDataFrame table {
         background-color: #ffffff !important;
         border-radius: 10px !important;
@@ -735,64 +747,8 @@ st.markdown("""
     }
     
     /* ============================================================
-       FILE UPLOADER - FONDO CLARO FORZADO
-       ============================================================ */
-    
-    .stFileUploader > div {
-        background-color: #ffffff !important;
-        border: 2px dashed #c8d0d8 !important;
-        border-radius: 10px !important;
-        padding: 20px !important;
-    }
-    
-    .stFileUploader > div:hover {
-        border-color: #1a4a7a !important;
-    }
-    
-    /* ============================================================
-       RESULTADOS
-       ============================================================ */
-    
-    .result-success {
-        background-color: #eafaf1 !important;
-        border-left: 6px solid #27ae60 !important;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
-        color: #1a2a3a !important;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
-    }
-    
-    .result-error {
-        background-color: #fdedec !important;
-        border-left: 6px solid #c0392b !important;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
-        color: #1a2a3a !important;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
-    }
-    
-    .result-info {
-        background-color: #eaf2fa !important;
-        border-left: 6px solid #1e40af !important;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
-        color: #1a2a3a !important;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
-    }
-    
-    /* ============================================================
        BOTONES EN ÁREA PRINCIPAL
        ============================================================ */
-    
     .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -812,7 +768,6 @@ st.markdown("""
     /* ============================================================
        RADIO BUTTONS
        ============================================================ */
-    
     .stRadio > div {
         background-color: #ffffff !important;
         padding: 10px 16px !important;
@@ -828,7 +783,6 @@ st.markdown("""
     /* ============================================================
        NUMBER INPUT
        ============================================================ */
-    
     .stNumberInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -839,7 +793,6 @@ st.markdown("""
     /* ============================================================
        FOOTER
        ============================================================ */
-    
     .footer {
         text-align: center;
         padding: 20px;
@@ -852,7 +805,6 @@ st.markdown("""
     /* ============================================================
        TEXTOS GENERALES
        ============================================================ */
-    
     h1, h2, h3, h4, h5, h6 {
         color: #1a2a3a !important;
         font-weight: 700 !important;
@@ -865,10 +817,6 @@ st.markdown("""
     .stSpinner > div {
         border-color: #1a4a7a !important;
     }
-    
-    /* ============================================================
-       MENSAJES DE STREAMLIT
-       ============================================================ */
     
     .stAlert {
         background-color: #ffffff !important;
@@ -883,7 +831,6 @@ st.markdown("""
     /* ============================================================
        FORZAR COLOR DE TEXTO EN TODOS LADOS
        ============================================================ */
-    
     * {
         color: #1a2a3a !important;
     }
@@ -891,7 +838,9 @@ st.markdown("""
     /* Excepción: textos que deben ser blancos */
     .stButton > button, .stButton > button *, 
     section[data-testid="stSidebar"] .stButton > button,
-    section[data-testid="stSidebar"] .stButton > button * {
+    section[data-testid="stSidebar"] .stButton > button *,
+    .stFileUploader > div > button,
+    .stFileUploader > div > button * {
         color: white !important;
     }
 </style>
@@ -1007,178 +956,138 @@ with st.sidebar:
 # ÁREA PRINCIPAL
 # ============================================================
 
-col_main, col_info = st.columns([2.5, 1])
-
-with col_main:
-    if uploaded_file is not None:
-        st.success(f"✅ Archivo cargado: {uploaded_file.name}")
-        
-        df_preview = pd.read_excel(uploaded_file)
-        
-        col_m1, col_m2, col_m3 = st.columns(3)
-        with col_m1:
-            st.markdown(f"""
-            <div class="metric-container animate animate-delay-1">
-                <div class="metric-value">{len(df_preview)}</div>
-                <div class="metric-label">Registros</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col_m2:
-            fecha_col = None
-            for col in df_preview.columns:
-                if 'date' in str(col).lower():
-                    fecha_col = col
-                    break
-            if fecha_col is None:
-                fecha_col = df_preview.columns[0]
-            
-            fechas_unicas = df_preview[fecha_col].nunique()
-            st.markdown(f"""
-            <div class="metric-container animate animate-delay-2">
-                <div class="metric-value">{fechas_unicas}</div>
-                <div class="metric-label">Fechas</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col_m3:
-            st.markdown(f"""
-            <div class="metric-container animate animate-delay-3">
-                <div class="metric-value">{datetime.now().strftime('%d/%m')}</div>
-                <div class="metric-label">Hoy</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with st.expander("👁️ Vista previa de datos"):
-            st.dataframe(df_preview.head(10), use_container_width=True)
-        
-        st.subheader("📅 Seleccionar período")
-        
-        tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
-        
-        if tipo_reporte == "Día específico":
-            col_dia1, col_dia2, col_dia3 = st.columns(3)
-            with col_dia1:
-                dia = st.number_input("Día", min_value=1, max_value=31, value=1)
-            with col_dia2:
-                mes = st.number_input("Mes", min_value=1, max_value=12, value=1)
-            with col_dia3:
-                año = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year)
-            
-            fecha_params = {'dia': dia, 'mes': mes, 'año': año}
-            
-        else:
-            st.markdown("**Fecha de inicio:**")
-            col_ini1, col_ini2, col_ini3 = st.columns(3)
-            with col_ini1:
-                dia_ini = st.number_input("Día inicio", min_value=1, max_value=31, value=1)
-            with col_ini2:
-                mes_ini = st.number_input("Mes inicio", min_value=1, max_value=12, value=1)
-            with col_ini3:
-                año_ini = st.number_input("Año inicio", min_value=2000, max_value=2100, value=datetime.now().year)
-            
-            st.markdown("**Fecha de fin:**")
-            col_fin1, col_fin2, col_fin3 = st.columns(3)
-            with col_fin1:
-                dia_fin = st.number_input("Día fin", min_value=1, max_value=31, value=1)
-            with col_fin2:
-                mes_fin = st.number_input("Mes fin", min_value=1, max_value=12, value=1)
-            with col_fin3:
-                año_fin = st.number_input("Año fin", min_value=2000, max_value=2100, value=datetime.now().year)
-            
-            fecha_params = {
-                'dia_ini': dia_ini, 'mes_ini': mes_ini, 'año_ini': año_ini,
-                'dia_fin': dia_fin, 'mes_fin': mes_fin, 'año_fin': año_fin
-            }
-        
-        if enviar_btn:
-            if not smtp_username or not smtp_password:
-                st.error("❌ Por favor ingresa tus credenciales de Outlook")
-            else:
-                to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
-                cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
-                
-                if not to_emails:
-                    st.error("❌ Debes especificar al menos un destinatario")
-                else:
-                    with st.spinner("⏳ Procesando y enviando reporte..."):
-                        tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
-                        
-                        success, msg = procesar_reporte(
-                            uploaded_file, tipo, fecha_params,
-                            smtp_username, smtp_password,
-                            to_emails, cc_emails,
-                            test_mode
-                        )
-                        
-                        if success:
-                            st.success(msg)
-                            if test_mode:
-                                st.info("🔬 Modo prueba activo: El correo se envió solo a tu cuenta")
-                            else:
-                                st.balloons()
-                        else:
-                            st.error(msg)
-        
-    else:
-        st.markdown("""
-        <div style="
-            text-align: center;
-            padding: 80px 30px;
-            background-color: #ffffff;
-            border-radius: 14px;
-            border: 2px dashed #e8edf2;
-            animation: fadeInUp 0.6s ease-out;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        ">
-            <div style="font-size: 64px; margin-bottom: 20px;">📂</div>
-            <h2 style="color: #1a2a3a; font-weight: 800; margin: 0; font-size: 26px;">Carga tu archivo Excel</h2>
-            <p style="color: #4a5a6a; margin: 12px 0 0 0; font-size: 16px;">
-                Sube el archivo con los registros de atención del consulado
-            </p>
-            <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">MM/DD/YYYY</span>
-                <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Fecha</span>
-                <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Atenciones</span>
-            </div>
+if uploaded_file is not None:
+    df_preview = pd.read_excel(uploaded_file)
+    
+    st.success(f"✅ Archivo cargado: {uploaded_file.name}")
+    
+    col_m1, col_m2, col_m3 = st.columns(3)
+    
+    with col_m1:
+        st.markdown(f"""
+        <div class="metric-container animate animate-delay-1">
+            <div class="metric-value">{len(df_preview)}</div>
+            <div class="metric-label">Registros</div>
         </div>
         """, unsafe_allow_html=True)
+    
+    with col_m2:
+        fecha_col = None
+        for col in df_preview.columns:
+            if 'date' in str(col).lower():
+                fecha_col = col
+                break
+        if fecha_col is None:
+            fecha_col = df_preview.columns[0]
+        
+        fechas_unicas = df_preview[fecha_col].nunique()
+        st.markdown(f"""
+        <div class="metric-container animate animate-delay-2">
+            <div class="metric-value">{fechas_unicas}</div>
+            <div class="metric-label">Fechas</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_m3:
+        st.markdown(f"""
+        <div class="metric-container animate animate-delay-3">
+            <div class="metric-value">{datetime.now().strftime('%d/%m')}</div>
+            <div class="metric-label">Hoy</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with st.expander("👁️ Vista previa de datos"):
+        st.dataframe(df_preview.head(10), use_container_width=True)
+    
+    st.subheader("📅 Seleccionar período")
+    
+    tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
+    
+    if tipo_reporte == "Día específico":
+        col_dia1, col_dia2, col_dia3 = st.columns(3)
+        with col_dia1:
+            dia = st.number_input("Día", min_value=1, max_value=31, value=1)
+        with col_dia2:
+            mes = st.number_input("Mes", min_value=1, max_value=12, value=1)
+        with col_dia3:
+            año = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year)
+        
+        fecha_params = {'dia': dia, 'mes': mes, 'año': año}
+        
+    else:
+        st.markdown("**Fecha de inicio:**")
+        col_ini1, col_ini2, col_ini3 = st.columns(3)
+        with col_ini1:
+            dia_ini = st.number_input("Día inicio", min_value=1, max_value=31, value=1)
+        with col_ini2:
+            mes_ini = st.number_input("Mes inicio", min_value=1, max_value=12, value=1)
+        with col_ini3:
+            año_ini = st.number_input("Año inicio", min_value=2000, max_value=2100, value=datetime.now().year)
+        
+        st.markdown("**Fecha de fin:**")
+        col_fin1, col_fin2, col_fin3 = st.columns(3)
+        with col_fin1:
+            dia_fin = st.number_input("Día fin", min_value=1, max_value=31, value=1)
+        with col_fin2:
+            mes_fin = st.number_input("Mes fin", min_value=1, max_value=12, value=1)
+        with col_fin3:
+            año_fin = st.number_input("Año fin", min_value=2000, max_value=2100, value=datetime.now().year)
+        
+        fecha_params = {
+            'dia_ini': dia_ini, 'mes_ini': mes_ini, 'año_ini': año_ini,
+            'dia_fin': dia_fin, 'mes_fin': mes_fin, 'año_fin': año_fin
+        }
+    
+    if enviar_btn:
+        if not smtp_username or not smtp_password:
+            st.error("❌ Por favor ingresa tus credenciales de Outlook")
+        else:
+            to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
+            cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
+            
+            if not to_emails:
+                st.error("❌ Debes especificar al menos un destinatario")
+            else:
+                with st.spinner("⏳ Procesando y enviando reporte..."):
+                    tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
+                    
+                    success, msg = procesar_reporte(
+                        uploaded_file, tipo, fecha_params,
+                        smtp_username, smtp_password,
+                        to_emails, cc_emails,
+                        test_mode
+                    )
+                    
+                    if success:
+                        st.success(msg)
+                        if test_mode:
+                            st.info("🔬 Modo prueba activo: El correo se envió solo a tu cuenta")
+                        else:
+                            st.balloons()
+                    else:
+                        st.error(msg)
 
-with col_info:
+else:
     st.markdown("""
-    <div class="card">
-        <div style="font-weight: 700; color: #1a2a3a; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #e8edf2; padding-bottom: 8px;">
-            📋 Instrucciones
+    <div style="
+        text-align: center;
+        padding: 80px 30px;
+        background-color: #ffffff;
+        border-radius: 14px;
+        border: 2px dashed #e8edf2;
+        animation: fadeInUp 0.6s ease-out;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    ">
+        <div style="font-size: 64px; margin-bottom: 20px;">📂</div>
+        <h2 style="color: #1a2a3a; font-weight: 800; margin: 0; font-size: 26px;">Carga tu archivo Excel</h2>
+        <p style="color: #4a5a6a; margin: 12px 0 0 0; font-size: 16px;">
+            Sube el archivo con los registros de atención del consulado
+        </p>
+        <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">MM/DD/YYYY</span>
+            <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Fecha</span>
+            <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Atenciones</span>
         </div>
-        <ol style="margin: 0; padding-left: 18px; color: #4a5a6a; font-size: 14px; line-height: 2;">
-            <li>Configura tu correo</li>
-            <li>Carga el archivo Excel</li>
-            <li>Selecciona el período</li>
-            <li>Activa modo prueba</li>
-            <li>Envía el reporte</li>
-        </ol>
-    </div>
-    
-    <div class="card">
-        <div style="font-weight: 700; color: #1a2a3a; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #e8edf2; padding-bottom: 8px;">
-            📌 Formato del Excel
-        </div>
-        <ul style="margin: 0; padding-left: 18px; color: #4a5a6a; font-size: 13px; line-height: 1.8;">
-            <li>Fecha en formato <code>MM/DD/YYYY</code></li>
-            <li>Ejemplo: <code>01/05/2026</code></li>
-            <li>Columna con nombre que contenga "date"</li>
-        </ul>
-    </div>
-    
-    <div class="card">
-        <div style="font-weight: 700; color: #1a2a3a; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #e8edf2; padding-bottom: 8px;">
-            🔒 Seguridad
-        </div>
-        <ul style="margin: 0; padding-left: 18px; color: #4a5a6a; font-size: 13px; line-height: 1.8;">
-            <li>🔐 TLS en conexión SMTP</li>
-            <li>🔑 Sin almacenamiento</li>
-            <li>🧪 Modo prueba disponible</li>
-        </ul>
     </div>
     """, unsafe_allow_html=True)
 
