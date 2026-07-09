@@ -1,3 +1,6 @@
+# consulate_report_app.py
+# Reporte de Atenciones - Consulado (con textos claros en sidebar)
+
 import streamlit as st
 import pandas as pd
 import smtplib
@@ -453,7 +456,7 @@ def get_colors(dark_mode=False):
             "text_primary": "#e8edf2",
             "text_secondary": "#8a9bb0",
             "text_dark": "#f0f4f8",
-            "text_sidebar": "#ffffff",  # Texto blanco en modo oscuro
+            "text_sidebar": "#ffffff",  # BLANCO en modo oscuro
             "sidebar_bg": "#0d1117",
             "blue": "#4a8bc2",
             "blue_dark": "#2a5a7a",
@@ -486,7 +489,7 @@ def get_colors(dark_mode=False):
             "text_primary": "#1a2a3a",
             "text_secondary": "#4a5a6a",
             "text_dark": "#0d1a2a",
-            "text_sidebar": "#1a2a3a",  # Texto oscuro en modo claro
+            "text_sidebar": "#1a2a3a",  # OSCURO en modo claro
             "sidebar_bg": "#f0f4f8",
             "blue": "#1a4a7a",
             "blue_dark": "#0d2a4a",
@@ -527,7 +530,7 @@ if 'dark_mode' not in st.session_state:
     st.session_state.dark_mode = False
 
 # ============================================================
-# CSS DE LA INTERFAZ - CON TEXTO LEGIBLE EN SIDEBAR
+# CSS - TODOS LOS TEXTOS DE SIDEBAR EN TONOS CLAROS
 # ============================================================
 
 def inject_css(colors):
@@ -563,7 +566,7 @@ def inject_css(colors):
         .animate-delay-4 {{ animation-delay: 0.4s; }}
         
         /* ============================================================
-           BARRA LATERAL - FORZADA A CLARA O CON TEXTO LEGIBLE
+           BARRA LATERAL - TODOS LOS TEXTOS EN TONOS CLAROS
            ============================================================ */
         .css-1d391kg {{
             background: linear-gradient(180deg, {colors['sidebar_grad1']}, {colors['sidebar_grad2']}) !important;
@@ -571,22 +574,31 @@ def inject_css(colors):
             animation: fadeInUp 0.5s ease-out;
         }}
         
-        /* Todos los textos en la barra lateral */
+        /* ============================================================
+           TODOS LOS TEXTOS EN LA BARRA LATERAL - CLAROS
+           ============================================================ */
+        .css-1d391kg *,
         .css-1d391kg .stMarkdown,
         .css-1d391kg .stText,
         .css-1d391kg .stCaption,
         .css-1d391kg label,
         .css-1d391kg .stMarkdown p,
         .css-1d391kg div,
-        .css-1d391kg span {{
-            color: {colors['text_sidebar']} !important;
+        .css-1d391kg span,
+        .css-1d391kg h1,
+        .css-1d391kg h2,
+        .css-1d391kg h3,
+        .css-1d391kg h4,
+        .css-1d391kg h5,
+        .css-1d391kg h6 {{
+            color: #e8edf2 !important;
         }}
         
-        /* Inputs en la barra lateral */
+        /* Inputs en la barra lateral - fondo claro, texto claro */
         .css-1d391kg .stTextInput > div > div > input {{
-            background-color: {colors['card_bg']} !important;
-            color: {colors['text_sidebar']} !important;
-            border-color: {colors['card_border']} !important;
+            background-color: #1a1a1e !important;
+            color: #e8edf2 !important;
+            border-color: #2a303a !important;
             border-radius: 8px !important;
             padding: 10px 14px !important;
             font-size: 14px !important;
@@ -594,7 +606,7 @@ def inject_css(colors):
         }}
         
         .css-1d391kg .stTextInput > div > div > input::placeholder {{
-            color: {colors['text_secondary']} !important;
+            color: #8a9bb0 !important;
             opacity: 0.7 !important;
         }}
         
@@ -604,20 +616,19 @@ def inject_css(colors):
         }}
         
         .css-1d391kg .stTextArea > div > div > textarea {{
-            background-color: {colors['card_bg']} !important;
-            color: {colors['text_sidebar']} !important;
-            border-color: {colors['card_border']} !important;
+            background-color: #1a1a1e !important;
+            color: #e8edf2 !important;
+            border-color: #2a303a !important;
             border-radius: 8px !important;
             font-size: 14px !important;
         }}
         
         .css-1d391kg .stFileUploader > div > button {{
-            background-color: {colors['card_bg']} !important;
-            color: {colors['text_sidebar']} !important;
-            border-color: {colors['card_border']} !important;
+            background-color: #1a1a1e !important;
+            color: #e8edf2 !important;
+            border-color: #2a303a !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
-            transition: all 0.3s ease !important;
         }}
         
         .css-1d391kg .stFileUploader > div > button:hover {{
@@ -627,7 +638,7 @@ def inject_css(colors):
         }}
         
         .css-1d391kg .stCheckbox label {{
-            color: {colors['text_sidebar']} !important;
+            color: #e8edf2 !important;
             font-weight: 600 !important;
             font-size: 14px !important;
         }}
@@ -653,7 +664,7 @@ def inject_css(colors):
         
         .css-1d391kg .stButton > button:last-child {{
             background: rgba(255,255,255,0.10) !important;
-            color: {colors['text_sidebar']} !important;
+            color: #e8edf2 !important;
             border: 1px solid rgba(255,255,255,0.15) !important;
         }}
         
@@ -663,19 +674,19 @@ def inject_css(colors):
         }}
         
         .css-1d391kg .stCaption {{
-            color: {colors['text_secondary']} !important;
+            color: #8a9bb0 !important;
             font-size: 11px !important;
             font-weight: 500 !important;
         }}
         
         .css-1d391kg hr {{
-            border-color: {colors['card_border']} !important;
+            border-color: #2a303a !important;
             margin: 12px 0 !important;
             opacity: 0.3 !important;
         }}
         
         /* ============================================================
-           TÍTULO DE LA BARRA LATERAL
+           TÍTULO DE LA BARRA LATERAL - CLARO
            ============================================================ */
         .sidebar-title {{
             text-align: center;
@@ -687,14 +698,14 @@ def inject_css(colors):
         
         .sidebar-title .main {{
             font-weight: 800;
-            color: {colors['text_sidebar']};
+            color: #e8edf2;
             font-size: 24px;
             letter-spacing: -0.3px;
         }}
         
         .sidebar-title .sub {{
             font-size: 12px;
-            color: {colors['text_secondary']};
+            color: #8a9bb0;
             letter-spacing: 1.5px;
             font-weight: 600;
         }}
@@ -725,13 +736,13 @@ def inject_css(colors):
         
         .sidebar-section .label {{
             font-weight: 700;
-            color: {colors['text_sidebar']};
+            color: #e8edf2 !important;
             font-size: 14px;
         }}
         
         .sidebar-section .desc {{
             font-size: 12px;
-            color: {colors['text_secondary']};
+            color: #8a9bb0 !important;
             margin-top: 2px;
         }}
         
