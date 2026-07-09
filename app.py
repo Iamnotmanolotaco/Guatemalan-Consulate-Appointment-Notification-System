@@ -1,6 +1,3 @@
-# consulate_report_app.py
-# Reporte de Atenciones - Consulado (versión Streamlit)
-
 import streamlit as st
 import pandas as pd
 import smtplib
@@ -423,14 +420,363 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# INTERFAZ STREAMLIT - SIN MODO OSCURO
+# INTERFAZ STREAMLIT - CON BARRA LATERAL CLARA
 # ============================================================
 
 st.set_page_config(
     page_title="Reporte Consulado",
     page_icon="📋",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
+
+# ============================================================
+# CSS PARA FORZAR BARRA LATERAL CLARA
+# ============================================================
+
+st.markdown("""
+<style>
+    /* Ocultar elementos de Streamlit */
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+    
+    /* Fondo general */
+    .stApp {
+        background-color: #e8edf2;
+    }
+    
+    /* ============================================================
+       BARRA LATERAL - FORZADA A CLARA
+       ============================================================ */
+    
+    /* Contenedor principal de la barra lateral */
+    section[data-testid="stSidebar"] {
+        background-color: #f0f4f8 !important;
+        border-right: 2px solid #1a4a7a !important;
+    }
+    
+    /* Contenedor interno de la barra lateral */
+    section[data-testid="stSidebar"] .css-1d391kg {
+        background-color: #f0f4f8 !important;
+    }
+    
+    /* Todos los textos en la barra lateral */
+    section[data-testid="stSidebar"] * {
+        color: #1a2a3a !important;
+    }
+    
+    /* Textos específicos */
+    section[data-testid="stSidebar"] .stMarkdown,
+    section[data-testid="stSidebar"] .stText,
+    section[data-testid="stSidebar"] .stCaption,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] div,
+    section[data-testid="stSidebar"] span {
+        color: #1a2a3a !important;
+    }
+    
+    /* Inputs en la barra lateral */
+    section[data-testid="stSidebar"] .stTextInput > div > div > input {
+        background-color: #ffffff !important;
+        color: #1a2a3a !important;
+        border-color: #c8d0d8 !important;
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
+        color: #8a9bb0 !important;
+        opacity: 0.7 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stTextInput > div > div > input:focus {
+        border-color: #1a4a7a !important;
+        box-shadow: 0 0 20px rgba(26, 74, 122, 0.15) !important;
+    }
+    
+    /* TextArea en la barra lateral */
+    section[data-testid="stSidebar"] .stTextArea > div > div > textarea {
+        background-color: #ffffff !important;
+        color: #1a2a3a !important;
+        border-color: #c8d0d8 !important;
+        border-radius: 8px !important;
+        font-size: 14px !important;
+    }
+    
+    /* FileUploader en la barra lateral */
+    section[data-testid="stSidebar"] .stFileUploader > div > button {
+        background-color: #ffffff !important;
+        color: #1a2a3a !important;
+        border-color: #c8d0d8 !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stFileUploader > div > button:hover {
+        background-color: #1a4a7a !important;
+        color: white !important;
+        border-color: #1a4a7a !important;
+    }
+    
+    /* Checkbox en la barra lateral */
+    section[data-testid="stSidebar"] .stCheckbox label {
+        color: #1a2a3a !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+    
+    /* Botón en la barra lateral */
+    section[data-testid="stSidebar"] .stButton > button {
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        padding: 10px 16px !important;
+        transition: all 0.3s ease !important;
+        border: none !important;
+        background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
+        color: white !important;
+    }
+    
+    section[data-testid="stSidebar"] .stButton > button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
+    }
+    
+    /* Caption en la barra lateral */
+    section[data-testid="stSidebar"] .stCaption {
+        color: #4a5a6a !important;
+        font-size: 11px !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Separadores en la barra lateral */
+    section[data-testid="stSidebar"] hr {
+        border-color: #d5dde6 !important;
+        margin: 12px 0 !important;
+        opacity: 0.5 !important;
+    }
+    
+    /* ============================================================
+       ANIMACIONES
+       ============================================================ */
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate { animation: fadeInUp 0.6s ease-out; }
+    .animate-delay-1 { animation-delay: 0.1s; }
+    .animate-delay-2 { animation-delay: 0.2s; }
+    .animate-delay-3 { animation-delay: 0.3s; }
+    
+    /* ============================================================
+       TÍTULO DE LA BARRA LATERAL
+       ============================================================ */
+    
+    .sidebar-title {
+        text-align: center;
+        padding: 16px 0 12px 0;
+        border-bottom: 2px solid #1a4a7a;
+        margin-bottom: 16px;
+    }
+    
+    .sidebar-title .main {
+        font-weight: 800;
+        color: #1a3a5c;
+        font-size: 24px;
+        letter-spacing: -0.3px;
+    }
+    
+    .sidebar-title .sub {
+        font-size: 12px;
+        color: #4a5a6a;
+        letter-spacing: 1.5px;
+        font-weight: 600;
+    }
+    
+    /* ============================================================
+       SECCIONES DE LA BARRA LATERAL
+       ============================================================ */
+    
+    .sidebar-section {
+        background: rgba(26, 74, 122, 0.06);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        border: 1px solid rgba(26, 74, 122, 0.10);
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-section:hover {
+        background: rgba(26, 74, 122, 0.10);
+        border-color: #1a4a7a;
+        transform: translateX(4px);
+    }
+    
+    .sidebar-section .icon {
+        font-size: 18px;
+        margin-right: 8px;
+    }
+    
+    .sidebar-section .label {
+        font-weight: 700;
+        color: #1a2a3a;
+        font-size: 14px;
+    }
+    
+    .sidebar-section .desc {
+        font-size: 12px;
+        color: #4a5a6a;
+        margin-top: 2px;
+    }
+    
+    /* ============================================================
+       TARJETAS
+       ============================================================ */
+    
+    .card {
+        background-color: #ffffff;
+        border-radius: 14px;
+        padding: 22px 26px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border: 1px solid #e8edf2;
+        margin-bottom: 16px;
+        animation: fadeInUp 0.5s ease-out;
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+    
+    /* ============================================================
+       MÉTRICAS
+       ============================================================ */
+    
+    .metric-container {
+        border-radius: 12px;
+        padding: 18px 16px;
+        text-align: center;
+        border: 2px solid #e8edf2;
+        background-color: #f5f8fc;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease-out;
+        min-height: 90px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .metric-container:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+    
+    .metric-value {
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1.2;
+        color: #1a4a7a;
+    }
+    
+    .metric-label {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 4px;
+        color: #4a5a6a;
+    }
+    
+    /* ============================================================
+       RESULTADOS
+       ============================================================ */
+    
+    .result-success {
+        background-color: rgba(46, 204, 113, 0.10);
+        border-left: 6px solid #27ae60;
+        padding: 14px 18px;
+        border-radius: 6px;
+        margin: 6px 0;
+        color: #1a2a3a;
+        font-size: 15px;
+        font-weight: 500;
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .result-error {
+        background-color: rgba(231, 76, 60, 0.10);
+        border-left: 6px solid #c0392b;
+        padding: 14px 18px;
+        border-radius: 6px;
+        margin: 6px 0;
+        color: #1a2a3a;
+        font-size: 15px;
+        font-weight: 500;
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .result-info {
+        background-color: rgba(52, 152, 219, 0.10);
+        border-left: 6px solid #1e40af;
+        padding: 14px 18px;
+        border-radius: 6px;
+        margin: 6px 0;
+        color: #1a2a3a;
+        font-size: 15px;
+        font-weight: 500;
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    
+    .footer {
+        text-align: center;
+        padding: 20px;
+        color: #4a5a6a;
+        font-size: 13px;
+        border-top: 2px solid #e8edf2;
+        margin-top: 30px;
+    }
+    
+    /* ============================================================
+       TEXTOS GENERALES
+       ============================================================ */
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: #1a2a3a !important;
+        font-weight: 700 !important;
+    }
+    
+    .stMarkdown, .stText, .stCaption, label {
+        color: #4a5a6a !important;
+    }
+    
+    .streamlit-expanderHeader {
+        color: #1a2a3a !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        background-color: #f5f8fc !important;
+        border-radius: 8px !important;
+    }
+    
+    .stSpinner > div {
+        border-color: #1a4a7a !important;
+    }
+    
+    .stDataFrame {
+        border-radius: 10px !important;
+        overflow: hidden !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # ============================================================
 # BANNER
@@ -469,293 +815,6 @@ else:
         </div>
     </div>
     """, unsafe_allow_html=True)
-
-# ============================================================
-# CSS
-# ============================================================
-
-st.markdown("""
-<style>
-    #MainMenu { visibility: hidden; }
-    footer { visibility: hidden; }
-    
-    .stApp {
-        background-color: #e8edf2;
-    }
-    
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animate { animation: fadeInUp 0.6s ease-out; }
-    .animate-delay-1 { animation-delay: 0.1s; }
-    .animate-delay-2 { animation-delay: 0.2s; }
-    .animate-delay-3 { animation-delay: 0.3s; }
-    
-    /* Sidebar clara */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #f0f4f8, #e8edf2) !important;
-        border-right: 2px solid #1a4a7a !important;
-    }
-    
-    .css-1d391kg .stMarkdown,
-    .css-1d391kg .stText,
-    .css-1d391kg .stCaption,
-    .css-1d391kg label,
-    .css-1d391kg .stMarkdown p {
-        color: #1a2a3a !important;
-    }
-    
-    .sidebar-title {
-        text-align: center;
-        padding: 16px 0 12px 0;
-        border-bottom: 2px solid #1a4a7a;
-        margin-bottom: 16px;
-    }
-    
-    .sidebar-title .main {
-        font-weight: 800;
-        color: #1a3a5c;
-        font-size: 24px;
-        letter-spacing: -0.3px;
-    }
-    
-    .sidebar-title .sub {
-        font-size: 12px;
-        color: #4a5a6a;
-        letter-spacing: 1.5px;
-        font-weight: 600;
-    }
-    
-    .sidebar-section {
-        background: rgba(26, 74, 122, 0.06);
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin-bottom: 12px;
-        border: 1px solid rgba(26, 74, 122, 0.10);
-        transition: all 0.3s ease;
-    }
-    
-    .sidebar-section:hover {
-        background: rgba(26, 74, 122, 0.10);
-        border-color: #1a4a7a;
-        transform: translateX(4px);
-    }
-    
-    .sidebar-section .icon {
-        font-size: 18px;
-        margin-right: 8px;
-    }
-    
-    .sidebar-section .label {
-        font-weight: 700;
-        color: #1a2a3a;
-        font-size: 14px;
-    }
-    
-    .sidebar-section .desc {
-        font-size: 12px;
-        color: #4a5a6a;
-        margin-top: 2px;
-    }
-    
-    /* Inputs */
-    .stTextInput > div > div > input {
-        background-color: #ffffff !important;
-        color: #1a2a3a !important;
-        border-color: #c8d0d8 !important;
-        border-radius: 8px !important;
-        padding: 10px 14px !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        border-color: #1a4a7a !important;
-        box-shadow: 0 0 20px rgba(26, 74, 122, 0.15) !important;
-    }
-    
-    .stTextInput > div > div > input::placeholder {
-        color: #8a9bb0 !important;
-        opacity: 0.7 !important;
-    }
-    
-    .stFileUploader > div > button {
-        background-color: #ffffff !important;
-        color: #1a2a3a !important;
-        border-color: #c8d0d8 !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-    }
-    
-    .stFileUploader > div > button:hover {
-        background-color: #1a4a7a !important;
-        color: white !important;
-        border-color: #1a4a7a !important;
-    }
-    
-    .stCheckbox label {
-        color: #1a2a3a !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-    }
-    
-    .stButton > button {
-        border-radius: 10px !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        padding: 10px 16px !important;
-        transition: all 0.3s ease !important;
-        border: none !important;
-        background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
-        color: white !important;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
-    }
-    
-    .stCaption {
-        color: #4a5a6a !important;
-        font-size: 11px !important;
-        font-weight: 500 !important;
-    }
-    
-    hr {
-        border-color: #d5dde6 !important;
-        margin: 12px 0 !important;
-        opacity: 0.5 !important;
-    }
-    
-    /* Tarjetas */
-    .card {
-        background-color: #ffffff;
-        border-radius: 14px;
-        padding: 22px 26px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        border: 1px solid #e8edf2;
-        margin-bottom: 16px;
-        animation: fadeInUp 0.5s ease-out;
-        transition: all 0.3s ease;
-    }
-    
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    }
-    
-    /* Métricas */
-    .metric-container {
-        border-radius: 12px;
-        padding: 18px 16px;
-        text-align: center;
-        border: 2px solid #e8edf2;
-        background-color: #f5f8fc;
-        transition: all 0.3s ease;
-        animation: fadeInUp 0.5s ease-out;
-        min-height: 90px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    
-    .metric-container:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    }
-    
-    .metric-value {
-        font-size: 32px;
-        font-weight: 800;
-        line-height: 1.2;
-        color: #1a4a7a;
-    }
-    
-    .metric-label {
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-top: 4px;
-        color: #4a5a6a;
-    }
-    
-    /* Resultados */
-    .result-success {
-        background-color: rgba(46, 204, 113, 0.10);
-        border-left: 6px solid #27ae60;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
-        color: #1a2a3a;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
-    }
-    
-    .result-error {
-        background-color: rgba(231, 76, 60, 0.10);
-        border-left: 6px solid #c0392b;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
-        color: #1a2a3a;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
-    }
-    
-    .result-info {
-        background-color: rgba(52, 152, 219, 0.10);
-        border-left: 6px solid #1e40af;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
-        color: #1a2a3a;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
-    }
-    
-    /* Footer */
-    .footer {
-        text-align: center;
-        padding: 20px;
-        color: #4a5a6a;
-        font-size: 13px;
-        border-top: 2px solid #e8edf2;
-        margin-top: 30px;
-    }
-    
-    h1, h2, h3, h4, h5, h6 {
-        color: #1a2a3a !important;
-        font-weight: 700 !important;
-    }
-    
-    .stMarkdown, .stText, .stCaption, label {
-        color: #4a5a6a !important;
-    }
-    
-    .streamlit-expanderHeader {
-        color: #1a2a3a !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        background-color: #f5f8fc !important;
-        border-radius: 8px !important;
-    }
-    
-    .stSpinner > div {
-        border-color: #1a4a7a !important;
-    }
-    
-    .stDataFrame {
-        border-radius: 10px !important;
-        overflow: hidden !important;
-    }
-</style>
-""", unsafe_allow_html=True)
 
 # ============================================================
 # SIDEBAR - CLARA Y LEGIBLE
