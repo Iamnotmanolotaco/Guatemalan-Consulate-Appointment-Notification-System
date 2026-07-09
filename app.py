@@ -420,7 +420,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# INTERFAZ STREAMLIT - CON BARRA LATERAL CLARA
+# INTERFAZ STREAMLIT - CON FONDOS CLAROS
 # ============================================================
 
 st.set_page_config(
@@ -431,7 +431,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS PARA FORZAR BARRA LATERAL CLARA
+# CSS PARA FORZAR TODOS LOS FONDOS CLAROS
 # ============================================================
 
 st.markdown("""
@@ -440,32 +440,36 @@ st.markdown("""
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
-    /* Fondo general */
+    /* ============================================================
+       FONDO GENERAL - CLARO
+       ============================================================ */
+    
     .stApp {
-        background-color: #e8edf2;
+        background-color: #e8edf2 !important;
+    }
+    
+    /* Contenedor principal */
+    .main > div {
+        background-color: #e8edf2 !important;
     }
     
     /* ============================================================
-       BARRA LATERAL - FORZADA A CLARA
+       BARRA LATERAL - CLARA
        ============================================================ */
     
-    /* Contenedor principal de la barra lateral */
     section[data-testid="stSidebar"] {
         background-color: #f0f4f8 !important;
         border-right: 2px solid #1a4a7a !important;
     }
     
-    /* Contenedor interno de la barra lateral */
     section[data-testid="stSidebar"] .css-1d391kg {
         background-color: #f0f4f8 !important;
     }
     
-    /* Todos los textos en la barra lateral */
     section[data-testid="stSidebar"] * {
         color: #1a2a3a !important;
     }
     
-    /* Textos específicos */
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] .stText,
     section[data-testid="stSidebar"] .stCaption,
@@ -476,7 +480,7 @@ st.markdown("""
         color: #1a2a3a !important;
     }
     
-    /* Inputs en la barra lateral */
+    /* Inputs en barra lateral */
     section[data-testid="stSidebar"] .stTextInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -497,7 +501,6 @@ st.markdown("""
         box-shadow: 0 0 20px rgba(26, 74, 122, 0.15) !important;
     }
     
-    /* TextArea en la barra lateral */
     section[data-testid="stSidebar"] .stTextArea > div > div > textarea {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -506,7 +509,6 @@ st.markdown("""
         font-size: 14px !important;
     }
     
-    /* FileUploader en la barra lateral */
     section[data-testid="stSidebar"] .stFileUploader > div > button {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -521,14 +523,12 @@ st.markdown("""
         border-color: #1a4a7a !important;
     }
     
-    /* Checkbox en la barra lateral */
     section[data-testid="stSidebar"] .stCheckbox label {
         color: #1a2a3a !important;
         font-weight: 600 !important;
         font-size: 14px !important;
     }
     
-    /* Botón en la barra lateral */
     section[data-testid="stSidebar"] .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -545,33 +545,17 @@ st.markdown("""
         box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
     }
     
-    /* Caption en la barra lateral */
     section[data-testid="stSidebar"] .stCaption {
         color: #4a5a6a !important;
         font-size: 11px !important;
         font-weight: 500 !important;
     }
     
-    /* Separadores en la barra lateral */
     section[data-testid="stSidebar"] hr {
         border-color: #d5dde6 !important;
         margin: 12px 0 !important;
         opacity: 0.5 !important;
     }
-    
-    /* ============================================================
-       ANIMACIONES
-       ============================================================ */
-    
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animate { animation: fadeInUp 0.6s ease-out; }
-    .animate-delay-1 { animation-delay: 0.1s; }
-    .animate-delay-2 { animation-delay: 0.2s; }
-    .animate-delay-3 { animation-delay: 0.3s; }
     
     /* ============================================================
        TÍTULO DE LA BARRA LATERAL
@@ -603,17 +587,17 @@ st.markdown("""
        ============================================================ */
     
     .sidebar-section {
-        background: rgba(26, 74, 122, 0.06);
+        background: rgba(26, 74, 122, 0.06) !important;
         border-radius: 10px;
         padding: 12px 16px;
         margin-bottom: 12px;
-        border: 1px solid rgba(26, 74, 122, 0.10);
+        border: 1px solid rgba(26, 74, 122, 0.10) !important;
         transition: all 0.3s ease;
     }
     
     .sidebar-section:hover {
-        background: rgba(26, 74, 122, 0.10);
-        border-color: #1a4a7a;
+        background: rgba(26, 74, 122, 0.10) !important;
+        border-color: #1a4a7a !important;
         transform: translateX(4px);
     }
     
@@ -624,26 +608,40 @@ st.markdown("""
     
     .sidebar-section .label {
         font-weight: 700;
-        color: #1a2a3a;
+        color: #1a2a3a !important;
         font-size: 14px;
     }
     
     .sidebar-section .desc {
         font-size: 12px;
-        color: #4a5a6a;
+        color: #4a5a6a !important;
         margin-top: 2px;
     }
     
     /* ============================================================
-       TARJETAS
+       ANIMACIONES
+       ============================================================ */
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate { animation: fadeInUp 0.6s ease-out; }
+    .animate-delay-1 { animation-delay: 0.1s; }
+    .animate-delay-2 { animation-delay: 0.2s; }
+    .animate-delay-3 { animation-delay: 0.3s; }
+    
+    /* ============================================================
+       TARJETAS - FONDO CLARO
        ============================================================ */
     
     .card {
-        background-color: #ffffff;
+        background-color: #ffffff !important;
         border-radius: 14px;
         padding: 22px 26px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        border: 1px solid #e8edf2;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+        border: 1px solid #e8edf2 !important;
         margin-bottom: 16px;
         animation: fadeInUp 0.5s ease-out;
         transition: all 0.3s ease;
@@ -651,37 +649,42 @@ st.markdown("""
     
     .card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08) !important;
+    }
+    
+    .card * {
+        color: #1a2a3a !important;
     }
     
     /* ============================================================
-       MÉTRICAS
+       MÉTRICAS - FONDO CLARO
        ============================================================ */
     
     .metric-container {
+        background-color: #ffffff !important;
         border-radius: 12px;
         padding: 18px 16px;
         text-align: center;
-        border: 2px solid #e8edf2;
-        background-color: #f5f8fc;
+        border: 2px solid #e8edf2 !important;
         transition: all 0.3s ease;
         animation: fadeInUp 0.5s ease-out;
         min-height: 90px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
     }
     
     .metric-container:hover {
         transform: translateY(-4px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
     }
     
     .metric-value {
         font-size: 32px;
         font-weight: 800;
         line-height: 1.2;
-        color: #1a4a7a;
+        color: #1a4a7a !important;
     }
     
     .metric-label {
@@ -690,7 +693,52 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.8px;
         margin-top: 4px;
-        color: #4a5a6a;
+        color: #4a5a6a !important;
+    }
+    
+    /* ============================================================
+       EXPANDER - FONDO CLARO
+       ============================================================ */
+    
+    .streamlit-expanderHeader {
+        background-color: #ffffff !important;
+        color: #1a2a3a !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        border-radius: 8px !important;
+        border: 1px solid #e8edf2 !important;
+    }
+    
+    .streamlit-expanderContent {
+        background-color: #ffffff !important;
+        border: 1px solid #e8edf2 !important;
+        border-top: none !important;
+        border-radius: 0 0 8px 8px !important;
+    }
+    
+    /* ============================================================
+       DATA FRAME - FONDO CLARO
+       ============================================================ */
+    
+    .stDataFrame {
+        background-color: #ffffff !important;
+        border-radius: 10px !important;
+        overflow: hidden !important;
+        border: 1px solid #e8edf2 !important;
+    }
+    
+    .stDataFrame table {
+        background-color: #ffffff !important;
+    }
+    
+    .stDataFrame th {
+        background-color: #f0f4f8 !important;
+        color: #1a2a3a !important;
+    }
+    
+    .stDataFrame td {
+        background-color: #ffffff !important;
+        color: #1a2a3a !important;
     }
     
     /* ============================================================
@@ -698,39 +746,86 @@ st.markdown("""
        ============================================================ */
     
     .result-success {
-        background-color: rgba(46, 204, 113, 0.10);
-        border-left: 6px solid #27ae60;
+        background-color: #eafaf1 !important;
+        border-left: 6px solid #27ae60 !important;
         padding: 14px 18px;
         border-radius: 6px;
         margin: 6px 0;
-        color: #1a2a3a;
+        color: #1a2a3a !important;
         font-size: 15px;
         font-weight: 500;
         animation: fadeInUp 0.4s ease-out;
     }
     
     .result-error {
-        background-color: rgba(231, 76, 60, 0.10);
-        border-left: 6px solid #c0392b;
+        background-color: #fdedec !important;
+        border-left: 6px solid #c0392b !important;
         padding: 14px 18px;
         border-radius: 6px;
         margin: 6px 0;
-        color: #1a2a3a;
+        color: #1a2a3a !important;
         font-size: 15px;
         font-weight: 500;
         animation: fadeInUp 0.4s ease-out;
     }
     
     .result-info {
-        background-color: rgba(52, 152, 219, 0.10);
-        border-left: 6px solid #1e40af;
+        background-color: #eaf2fa !important;
+        border-left: 6px solid #1e40af !important;
         padding: 14px 18px;
         border-radius: 6px;
         margin: 6px 0;
-        color: #1a2a3a;
+        color: #1a2a3a !important;
         font-size: 15px;
         font-weight: 500;
         animation: fadeInUp 0.4s ease-out;
+    }
+    
+    /* ============================================================
+       BOTONES EN ÁREA PRINCIPAL
+       ============================================================ */
+    
+    .stButton > button {
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        padding: 10px 24px !important;
+        transition: all 0.3s ease !important;
+        border: none !important;
+        background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
+        color: white !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
+    }
+    
+    /* ============================================================
+       RADIO BUTTONS
+       ============================================================ */
+    
+    .stRadio > div {
+        background-color: #ffffff !important;
+        padding: 10px 16px !important;
+        border-radius: 8px !important;
+        border: 1px solid #e8edf2 !important;
+    }
+    
+    .stRadio label {
+        color: #1a2a3a !important;
+        font-weight: 500 !important;
+    }
+    
+    /* ============================================================
+       NUMBER INPUT
+       ============================================================ */
+    
+    .stNumberInput > div > div > input {
+        background-color: #ffffff !important;
+        color: #1a2a3a !important;
+        border-color: #c8d0d8 !important;
+        border-radius: 8px !important;
     }
     
     /* ============================================================
@@ -740,7 +835,7 @@ st.markdown("""
     .footer {
         text-align: center;
         padding: 20px;
-        color: #4a5a6a;
+        color: #4a5a6a !important;
         font-size: 13px;
         border-top: 2px solid #e8edf2;
         margin-top: 30px;
@@ -759,21 +854,22 @@ st.markdown("""
         color: #4a5a6a !important;
     }
     
-    .streamlit-expanderHeader {
-        color: #1a2a3a !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        background-color: #f5f8fc !important;
-        border-radius: 8px !important;
-    }
-    
     .stSpinner > div {
         border-color: #1a4a7a !important;
     }
     
-    .stDataFrame {
-        border-radius: 10px !important;
-        overflow: hidden !important;
+    /* ============================================================
+       MENSAJES DE STREAMLIT
+       ============================================================ */
+    
+    .stAlert {
+        background-color: #ffffff !important;
+        border: 1px solid #e8edf2 !important;
+        border-radius: 8px !important;
+    }
+    
+    .stAlert > div {
+        color: #1a2a3a !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1010,6 +1106,7 @@ with col_main:
             border-radius: 14px;
             border: 2px dashed #e8edf2;
             animation: fadeInUp 0.6s ease-out;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         ">
             <div style="font-size: 64px; margin-bottom: 20px;">📂</div>
             <h2 style="color: #1a2a3a; font-weight: 800; margin: 0; font-size: 26px;">Carga tu archivo Excel</h2>
