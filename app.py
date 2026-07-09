@@ -8,6 +8,8 @@ from email.mime.image import MIMEImage
 import base64
 from datetime import datetime
 import requests
+from io import BytesIO
+from PIL import Image
 
 # ============================================================
 # CONFIGURACIÓN
@@ -16,7 +18,7 @@ import requests
 SMTP_SERVER = "smtp.office365.com"
 SMTP_PORT = 587
 
-URL_LOGO_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/logo.png"
+URL_LOGO_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/image.png"
 URL_BANNER_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/banner.png"
 
 NOMBRE_EMPRESA = "Community Law Group, PLLC® "
@@ -29,6 +31,7 @@ DEFAULT_TO = ["consnashville@minex.gob.gt"]
 DEFAULT_CC = ["lsillescas@minex.gob.gt", "dataprojects@communitylawgroup.com", 
               "executiveassistant2@communitylawgroup.com", "data.analyst7@communitylawgroup.com"]
 
+LOGO_WIDTH = 180
 TAMANO_LOGO = 190
 
 MESES = {
@@ -38,7 +41,7 @@ MESES = {
 }
 
 # ============================================================
-# FUNCIONES PARA OBTENER RECURSOS
+# FUNCIONES PARA OBTENER Y REDIMENSIONAR LOGO
 # ============================================================
 
 def get_image_from_github(url):
@@ -51,8 +54,29 @@ def get_image_from_github(url):
     except Exception as e:
         return None
 
+def resize_logo(logo_bytes, target_width=LOGO_WIDTH):
+    try:
+        if logo_bytes is None:
+            return None
+        img = Image.open(BytesIO(logo_bytes))
+        original_width, original_height = img.size
+        aspect_ratio = original_height / original_width
+        target_height = int(target_width * aspect_ratio)
+        img_resized = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
+        output = BytesIO()
+        img_resized.save(output, format='PNG', quality=95, optimize=True)
+        output.seek(0)
+        print(f"   🖼️ Logo redimensionado: {target_width}x{target_height}px")
+        return output.getvalue()
+    except Exception as e:
+        print(f"   ⚠️ Error al redimensionar logo: {e}")
+        return logo_bytes
+
 def get_logo_bytes():
-    return get_image_from_github(URL_LOGO_GITHUB)
+    logo_bytes = get_image_from_github(URL_LOGO_GITHUB)
+    if logo_bytes:
+        return resize_logo(logo_bytes, LOGO_WIDTH)
+    return None
 
 def get_banner_base64():
     image_bytes = get_image_from_github(URL_BANNER_GITHUB)
@@ -320,9 +344,9 @@ def enviar_correo(smtp_username, smtp_password, to_emails, cc_emails,
                 image_part.add_header('Content-Disposition', 'inline', filename='logo.png')
                 image_part.add_header('X-Attachment-Id', logo_cid)
                 msg.attach(image_part)
-                print("🖼️ Logo adjuntado correctamente")
+                print("   🖼️ Logo adjuntado correctamente")
             except Exception as e:
-                print(f"⚠️ Error al adjuntar logo: {e}")
+                print(f"   ⚠️ Error al adjuntar logo: {e}")
         
         context = ssl.create_default_context()
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
@@ -417,7 +441,79 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# CONFIGURACIÓN DE PÁGINA
+# PALETA DE COLORES (USCIS)
+# ============================================================
+
+def get_colors(dark_mode=False):
+    if dark_mode:
+        return {
+            "bg": "#0a0e14",
+            "card_bg": "#161a22",
+            "card_border": "#2a303a",
+            "text_primary": "#e8edf2",
+            "text_secondary": "#8a9bb0",
+            "text_dark": "#f0f4f8",
+            "text_sidebar": "#ffffff",
+            "sidebar_bg": "#0d1117",
+            "blue": "#4a8bc2",
+            "blue_dark": "#2a5a7a",
+            "red": "#e74c3c",
+            "red_dark": "#a93226",
+            "yellow": "#f1c40f",
+            "yellow_dark": "#b7950b",
+            "green": "#2ecc71",
+            "green_dark": "#1a7a42",
+            "purple": "#8e44ad",
+            "orange": "#e67e22",
+            "teal": "#1abc9c",
+            "urgent": "#e74c3c",
+            "warning": "#f39c12",
+            "success": "#2ecc71",
+            "info": "#3498db",
+            "header_bg": "#0d1117",
+            "banner_grad1": "#1a2744",
+            "banner_grad2": "#2a4a6a",
+            "metric_bg": "#1c2430",
+            "shadow": "rgba(0,0,0,0.6)",
+            "sidebar_grad1": "#0d1117",
+            "sidebar_grad2": "#161a22"
+        }
+    else:
+        return {
+            "bg": "#e8edf2",
+            "card_bg": "#ffffff",
+            "card_border": "#c8d0d8",
+            "text_primary": "#1a2a3a",
+            "text_secondary": "#4a5a6a",
+            "text_dark": "#0d1a2a",
+            "text_sidebar": "#1a2a3a",
+            "sidebar_bg": "#f0f4f8",
+            "blue": "#1a4a7a",
+            "blue_dark": "#0d2a4a",
+            "red": "#c0392b",
+            "red_dark": "#922b21",
+            "yellow": "#d4ac0d",
+            "yellow_dark": "#9a7d0a",
+            "green": "#1e8449",
+            "green_dark": "#145a32",
+            "purple": "#6c3483",
+            "orange": "#ca6f1e",
+            "teal": "#148f77",
+            "urgent": "#c0392b",
+            "warning": "#e67e22",
+            "success": "#27ae60",
+            "info": "#1e40af",
+            "header_bg": "#f0f4f8",
+            "banner_grad1": "#1a3a5c",
+            "banner_grad2": "#4a7c9c",
+            "metric_bg": "#eef2f6",
+            "shadow": "rgba(0,0,0,0.1)",
+            "sidebar_grad1": "#e8edf2",
+            "sidebar_grad2": "#d5dde6"
+        }
+
+# ============================================================
+# INTERFAZ STREAMLIT
 # ============================================================
 
 st.set_page_config(
@@ -427,459 +523,441 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+if 'dark_mode' not in st.session_state:
+    st.session_state.dark_mode = False
+
 # ============================================================
-# CSS - ESTRUCTURA USCIS (FONDOS BLANCOS)
+# CSS DE LA INTERFAZ (USCIS)
 # ============================================================
 
-st.markdown("""
-<style>
-    /* Ocultar elementos de Streamlit */
-    #MainMenu { visibility: hidden; }
-    footer { visibility: hidden; }
-    
-    /* ============================================================
-       FONDO GENERAL - BLANCO
-       ============================================================ */
-    .stApp {
-        background-color: #f0f4f8 !important;
-    }
-    
-    .stApp > div {
-        background-color: #f0f4f8 !important;
-    }
-    
-    .main > div {
-        background-color: #f0f4f8 !important;
-    }
-    
-    .block-container {
-        background-color: #f0f4f8 !important;
-        padding-top: 2rem !important;
-    }
-    
-    /* ============================================================
-       BARRA LATERAL - CLARA
-       ============================================================ */
-    section[data-testid="stSidebar"] {
-        background-color: #ffffff !important;
-        border-right: 2px solid #1a4a7a !important;
-    }
-    
-    section[data-testid="stSidebar"] > div {
-        background-color: #ffffff !important;
-    }
-    
-    section[data-testid="stSidebar"] * {
-        color: #1a2a3a !important;
-    }
-    
-    section[data-testid="stSidebar"] .stMarkdown,
-    section[data-testid="stSidebar"] .stText,
-    section[data-testid="stSidebar"] .stCaption,
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] div,
-    section[data-testid="stSidebar"] span {
-        color: #1a2a3a !important;
-    }
-    
-    /* Inputs en barra lateral */
-    section[data-testid="stSidebar"] .stTextInput > div > div > input {
-        background-color: #f5f8fc !important;
-        color: #1a2a3a !important;
-        border-color: #c8d0d8 !important;
-        border-radius: 8px !important;
-        padding: 10px 14px !important;
-        font-size: 14px !important;
-    }
-    
-    section[data-testid="stSidebar"] .stTextArea > div > div > textarea {
-        background-color: #f5f8fc !important;
-        color: #1a2a3a !important;
-        border-color: #c8d0d8 !important;
-        border-radius: 8px !important;
-        font-size: 14px !important;
-    }
-    
-    section[data-testid="stSidebar"] .stFileUploader > div > button {
-        background-color: #1a4a7a !important;
-        color: white !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        border: none !important;
-    }
-    
-    section[data-testid="stSidebar"] .stFileUploader > div > button:hover {
-        background-color: #0d2a4a !important;
-    }
-    
-    section[data-testid="stSidebar"] .stCheckbox label {
-        color: #1a2a3a !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-    }
-    
-    section[data-testid="stSidebar"] .stButton > button {
-        border-radius: 10px !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        padding: 10px 16px !important;
-        border: none !important;
-        background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
-        color: white !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    section[data-testid="stSidebar"] .stButton > button:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
-    }
-    
-    section[data-testid="stSidebar"] .stCaption {
-        color: #4a5a6a !important;
-        font-size: 11px !important;
-        font-weight: 500 !important;
-    }
-    
-    section[data-testid="stSidebar"] hr {
-        border-color: #d5dde6 !important;
-        margin: 12px 0 !important;
-        opacity: 0.5 !important;
-    }
-    
-    /* ============================================================
-       TÍTULO DE LA BARRA LATERAL
-       ============================================================ */
-    .sidebar-title {
-        text-align: center;
-        padding: 16px 0 12px 0;
-        border-bottom: 2px solid #1a4a7a;
-        margin-bottom: 16px;
-    }
-    
-    .sidebar-title .main {
-        font-weight: 800;
-        color: #1a3a5c;
-        font-size: 24px;
-        letter-spacing: -0.3px;
-    }
-    
-    .sidebar-title .sub {
-        font-size: 12px;
-        color: #4a5a6a;
-        letter-spacing: 1.5px;
-        font-weight: 600;
-    }
-    
-    /* ============================================================
-       SECCIONES DE LA BARRA LATERAL
-       ============================================================ */
-    .sidebar-section {
-        background: rgba(26, 74, 122, 0.04) !important;
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin-bottom: 12px;
-        border: 1px solid rgba(26, 74, 122, 0.08) !important;
-        transition: all 0.3s ease;
-    }
-    
-    .sidebar-section:hover {
-        background: rgba(26, 74, 122, 0.08) !important;
-        border-color: #1a4a7a !important;
-        transform: translateX(4px);
-    }
-    
-    .sidebar-section .icon {
-        font-size: 18px;
-        margin-right: 8px;
-    }
-    
-    .sidebar-section .label {
-        font-weight: 700;
-        color: #1a2a3a !important;
-        font-size: 14px;
-    }
-    
-    .sidebar-section .desc {
-        font-size: 12px;
-        color: #4a5a6a !important;
-        margin-top: 2px;
-    }
-    
-    /* ============================================================
-       ANIMACIONES
-       ============================================================ */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animate { animation: fadeInUp 0.6s ease-out; }
-    .animate-delay-1 { animation-delay: 0.1s; }
-    .animate-delay-2 { animation-delay: 0.2s; }
-    .animate-delay-3 { animation-delay: 0.3s; }
-    
-    /* ============================================================
-       TARJETAS - FONDO BLANCO
-       ============================================================ */
-    div[data-testid="stExpander"] {
-        background-color: #ffffff !important;
-        border-radius: 12px !important;
-        border: 1px solid #e8edf2 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
-    }
-    
-    .streamlit-expanderHeader {
-        background-color: #ffffff !important;
-        color: #1a2a3a !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        border-radius: 12px 12px 0 0 !important;
-    }
-    
-    .streamlit-expanderContent {
-        background-color: #ffffff !important;
-        border-radius: 0 0 12px 12px !important;
-    }
-    
-    /* ============================================================
-       MÉTRICAS - FONDO BLANCO
-       ============================================================ */
-    .metric-container {
-        background-color: #ffffff !important;
-        border-radius: 12px;
-        padding: 20px 16px;
-        text-align: center;
-        border: 1px solid #e8edf2 !important;
-        transition: all 0.3s ease;
-        animation: fadeInUp 0.5s ease-out;
-        min-height: 90px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
-    }
-    
-    .metric-container:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
-    }
-    
-    .metric-value {
-        font-size: 32px;
-        font-weight: 800;
-        line-height: 1.2;
-        color: #1a4a7a !important;
-    }
-    
-    .metric-label {
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-top: 4px;
-        color: #4a5a6a !important;
-    }
-    
-    /* ============================================================
-       DATA FRAME - FONDO BLANCO
-       ============================================================ */
-    .stDataFrame {
-        background-color: #ffffff !important;
-        border-radius: 10px !important;
-        overflow: hidden !important;
-        border: 1px solid #e8edf2 !important;
-    }
-    
-    .stDataFrame > div {
-        background-color: #ffffff !important;
-    }
-    
-    .stDataFrame table {
-        background-color: #ffffff !important;
-    }
-    
-    .stDataFrame th {
-        background-color: #f0f4f8 !important;
-        color: #1a2a3a !important;
-    }
-    
-    .stDataFrame td {
-        background-color: #ffffff !important;
-        color: #1a2a3a !important;
-    }
-    
-    /* ============================================================
-       BOTÓN EN ÁREA PRINCIPAL
-       ============================================================ */
-    .stButton > button {
-        border-radius: 10px !important;
-        font-weight: 700 !important;
-        font-size: 16px !important;
-        padding: 10px 24px !important;
-        border: none !important;
-        background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
-        color: white !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
-    }
-    
-    /* ============================================================
-       RADIO BUTTONS
-       ============================================================ */
-    .stRadio > div {
-        background-color: #ffffff !important;
-        padding: 10px 16px !important;
-        border-radius: 8px !important;
-        border: 1px solid #e8edf2 !important;
-    }
-    
-    .stRadio label {
-        color: #1a2a3a !important;
-        font-weight: 500 !important;
-    }
-    
-    /* ============================================================
-       NUMBER INPUT
-       ============================================================ */
-    .stNumberInput > div > div > input {
-        background-color: #ffffff !important;
-        color: #1a2a3a !important;
-        border-color: #c8d0d8 !important;
-        border-radius: 8px !important;
-    }
-    
-    /* ============================================================
-       FILE UPLOADER
-       ============================================================ */
-    .stFileUploader > div {
-        background-color: #ffffff !important;
-        border: 2px dashed #c8d0d8 !important;
-        border-radius: 10px !important;
-        padding: 20px !important;
-    }
-    
-    .stFileUploader > div:hover {
-        border-color: #1a4a7a !important;
-    }
-    
-    .stFileUploader > div > button {
-        background-color: #1a4a7a !important;
-        color: white !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        border: none !important;
-    }
-    
-    .stFileUploader > div > button:hover {
-        background-color: #0d2a4a !important;
-    }
-    
-    /* ============================================================
-       FOOTER
-       ============================================================ */
-    .footer {
-        text-align: center;
-        padding: 20px;
-        color: #4a5a6a !important;
-        font-size: 13px;
-        border-top: 2px solid #e8edf2;
-        margin-top: 30px;
-    }
-    
-    /* ============================================================
-       TEXTOS GENERALES
-       ============================================================ */
-    h1, h2, h3, h4, h5, h6 {
-        color: #1a2a3a !important;
-        font-weight: 700 !important;
-    }
-    
-    .stMarkdown, .stText, .stCaption, label {
-        color: #4a5a6a !important;
-    }
-    
-    .stAlert {
-        background-color: #ffffff !important;
-        border: 1px solid #e8edf2 !important;
-        border-radius: 8px !important;
-    }
-    
-    .stAlert > div {
-        color: #1a2a3a !important;
-    }
-    
-    /* ============================================================
-       FORZAR COLOR DE TEXTO EN TODOS LADOS
-       ============================================================ */
-    * {
-        color: #1a2a3a !important;
-    }
-    
-    /* Excepción: textos que deben ser blancos */
-    .stButton > button, .stButton > button *, 
-    section[data-testid="stSidebar"] .stButton > button,
-    section[data-testid="stSidebar"] .stButton > button *,
-    .stFileUploader > div > button,
-    .stFileUploader > div > button * {
-        color: white !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+def inject_css(colors):
+    st.markdown(f"""
+    <style>
+        #MainMenu {{ visibility: hidden; }}
+        footer {{ visibility: hidden; }}
+        
+        .stApp {{
+            background-color: {colors['bg']};
+        }}
+        
+        @keyframes fadeInUp {{
+            from {{ opacity: 0; transform: translateY(20px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        
+        @keyframes pulse {{
+            0% {{ transform: scale(1); }}
+            50% {{ transform: scale(1.03); }}
+            100% {{ transform: scale(1); }}
+        }}
+        
+        @keyframes slideIn {{
+            from {{ opacity: 0; transform: translateX(-20px); }}
+            to {{ opacity: 1; transform: translateX(0); }}
+        }}
+        
+        .animate {{ animation: fadeInUp 0.6s ease-out; }}
+        .animate-delay-1 {{ animation-delay: 0.1s; }}
+        .animate-delay-2 {{ animation-delay: 0.2s; }}
+        .animate-delay-3 {{ animation-delay: 0.3s; }}
+        .animate-delay-4 {{ animation-delay: 0.4s; }}
+        
+        .css-1d391kg {{
+            background: linear-gradient(180deg, {colors['sidebar_grad1']}, {colors['sidebar_grad2']}) !important;
+            border-right: 2px solid {colors['blue']} !important;
+            animation: fadeInUp 0.5s ease-out;
+        }}
+        
+        .css-1d391kg .stMarkdown,
+        .css-1d391kg .stText,
+        .css-1d391kg .stCaption,
+        .css-1d391kg label,
+        .css-1d391kg .stMarkdown p {{
+            color: {colors['text_sidebar']} !important;
+        }}
+        
+        .sidebar-title {{
+            text-align: center;
+            padding: 16px 0 12px 0;
+            border-bottom: 2px solid {colors['blue']};
+            margin-bottom: 16px;
+            animation: pulse 3s infinite;
+        }}
+        
+        .sidebar-title .main {{
+            font-weight: 800;
+            color: {colors['text_sidebar']};
+            font-size: 24px;
+            letter-spacing: -0.3px;
+        }}
+        
+        .sidebar-title .sub {{
+            font-size: 12px;
+            color: {colors['text_secondary']};
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }}
+        
+        .sidebar-section {{
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }}
+        
+        .sidebar-section:hover {{
+            background: rgba(255,255,255,0.10);
+            border-color: {colors['blue']};
+            transform: translateX(4px);
+        }}
+        
+        .sidebar-section .icon {{
+            font-size: 18px;
+            margin-right: 8px;
+        }}
+        
+        .sidebar-section .label {{
+            font-weight: 700;
+            color: {colors['text_sidebar']};
+            font-size: 14px;
+        }}
+        
+        .sidebar-section .desc {{
+            font-size: 12px;
+            color: {colors['text_secondary']};
+            margin-top: 2px;
+        }}
+        
+        .css-1d391kg .stTextInput > div > div > input {{
+            background-color: {colors['card_bg']} !important;
+            color: {colors['text_sidebar']} !important;
+            border-color: {colors['card_border']} !important;
+            border-radius: 8px !important;
+            padding: 10px 14px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+        }}
+        
+        .css-1d391kg .stTextInput > div > div > input:focus {{
+            border-color: {colors['blue']} !important;
+            box-shadow: 0 0 20px rgba(74, 139, 194, 0.2) !important;
+        }}
+        
+        .css-1d391kg .stTextInput > div > div > input::placeholder {{
+            color: {colors['text_secondary']} !important;
+            opacity: 0.7 !important;
+        }}
+        
+        .css-1d391kg .stDateInput > div > div > input {{
+            background-color: {colors['card_bg']} !important;
+            color: {colors['text_sidebar']} !important;
+            border-color: {colors['card_border']} !important;
+            border-radius: 8px !important;
+            padding: 10px 14px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+        }}
+        
+        .css-1d391kg .stFileUploader > div > button {{
+            background-color: {colors['card_bg']} !important;
+            color: {colors['text_sidebar']} !important;
+            border-color: {colors['card_border']} !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }}
+        
+        .css-1d391kg .stFileUploader > div > button:hover {{
+            background-color: {colors['blue']} !important;
+            color: white !important;
+            border-color: {colors['blue']} !important;
+        }}
+        
+        .css-1d391kg .stCheckbox label {{
+            color: {colors['text_sidebar']} !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+        }}
+        
+        .css-1d391kg .stButton > button {{
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+            font-size: 15px !important;
+            padding: 10px 16px !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+        }}
+        
+        .css-1d391kg .stButton > button:first-child {{
+            background: linear-gradient(135deg, {colors['blue']}, {colors['purple']}) !important;
+            color: white !important;
+        }}
+        
+        .css-1d391kg .stButton > button:first-child:hover {{
+            transform: translateY(-3px) !important;
+            box-shadow: 0 6px 25px rgba(74, 139, 194, 0.4) !important;
+        }}
+        
+        .css-1d391kg .stButton > button:last-child {{
+            background: rgba(255,255,255,0.10) !important;
+            color: {colors['text_sidebar']} !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+        }}
+        
+        .css-1d391kg .stButton > button:last-child:hover {{
+            background: rgba(255,255,255,0.20) !important;
+            transform: translateY(-3px) !important;
+        }}
+        
+        .css-1d391kg .stCaption {{
+            color: {colors['text_secondary']} !important;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+        }}
+        
+        .css-1d391kg hr {{
+            border-color: {colors['card_border']} !important;
+            margin: 12px 0 !important;
+            opacity: 0.3 !important;
+        }}
+        
+        .metric-container {{
+            border-radius: 12px;
+            padding: 18px 16px;
+            text-align: center;
+            border: 2px solid {colors['card_border']};
+            background-color: {colors['metric_bg']};
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease-out;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }}
+        
+        .metric-container:hover {{
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px {colors['shadow']};
+        }}
+        
+        .metric-value {{
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1.2;
+        }}
+        
+        .metric-label {{
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 4px;
+        }}
+        
+        .metric-red .metric-value {{ color: {colors['red']}; }}
+        .metric-red .metric-label {{ color: {colors['red_dark']}; }}
+        .metric-red {{ border-color: {colors['red']}; }}
+        
+        .metric-yellow .metric-value {{ color: {colors['yellow_dark']}; }}
+        .metric-yellow .metric-label {{ color: {colors['yellow_dark']}; }}
+        .metric-yellow {{ border-color: {colors['yellow']}; }}
+        
+        .metric-green .metric-value {{ color: {colors['green']}; }}
+        .metric-green .metric-label {{ color: {colors['green_dark']}; }}
+        .metric-green {{ border-color: {colors['green']}; }}
+        
+        .metric-blue .metric-value {{ color: {colors['blue']}; }}
+        .metric-blue .metric-label {{ color: {colors['blue_dark']}; }}
+        .metric-blue {{ border-color: {colors['blue']}; }}
+        
+        .metric-purple .metric-value {{ color: {colors['purple']}; }}
+        .metric-purple .metric-label {{ color: {colors['purple']}; }}
+        .metric-purple {{ border-color: {colors['purple']}; }}
+        
+        .result-success {{
+            background-color: rgba(46, 204, 113, 0.10);
+            border-left: 6px solid {colors['green']};
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin: 6px 0;
+            color: {colors['text_primary']};
+            font-size: 15px;
+            font-weight: 500;
+            animation: slideIn 0.4s ease-out;
+        }}
+        
+        .result-error {{
+            background-color: rgba(231, 76, 60, 0.10);
+            border-left: 6px solid {colors['red']};
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin: 6px 0;
+            color: {colors['text_primary']};
+            font-size: 15px;
+            font-weight: 500;
+            animation: slideIn 0.4s ease-out;
+        }}
+        
+        .result-info {{
+            background-color: rgba(52, 152, 219, 0.10);
+            border-left: 6px solid {colors['info']};
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin: 6px 0;
+            color: {colors['text_primary']};
+            font-size: 15px;
+            font-weight: 500;
+            animation: slideIn 0.4s ease-out;
+        }}
+        
+        .footer {{
+            text-align: center;
+            padding: 20px;
+            color: {colors['text_secondary']};
+            font-size: 13px;
+            border-top: 2px solid {colors['card_border']};
+            margin-top: 30px;
+            animation: fadeInUp 0.6s ease-out;
+        }}
+        
+        h1, h2, h3, h4, h5, h6 {{
+            color: {colors['text_primary']} !important;
+            font-weight: 700 !important;
+        }}
+        
+        .stMarkdown, .stText, .stCaption, label {{
+            color: {colors['text_secondary']} !important;
+        }}
+        
+        .banner-container {{
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            animation: fadeInUp 0.5s ease-out;
+            box-shadow: 0 4px 20px {colors['shadow']};
+        }}
+        
+        .streamlit-expanderHeader {{
+            color: {colors['text_primary']} !important;
+            font-weight: 700 !important;
+            font-size: 15px !important;
+            background-color: {colors['metric_bg']} !important;
+            border-radius: 8px !important;
+        }}
+        
+        .stDataFrame {{
+            border-radius: 10px !important;
+            overflow: hidden !important;
+        }}
+        
+        .stSpinner > div {{
+            border-color: {colors['blue']} !important;
+        }}
+        
+        .text-large {{
+            font-size: 18px;
+            line-height: 1.6;
+        }}
+        
+        .text-dark {{ color: {colors['text_dark']} !important; font-weight: 700; }}
+    </style>
+    """, unsafe_allow_html=True)
 
 # ============================================================
 # BANNER
 # ============================================================
 
-banner_base64 = get_banner_base64()
-
-if banner_base64:
-    st.markdown(f"""
-    <div style="width: 100%; margin-bottom: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
-        <img src="{banner_base64}" alt="Reporte Consulado" style="width: 100%; height: auto; display: block;">
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, #1a3a5c, #4a7c9c);
-        padding: 30px 40px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 15px rgba(26, 58, 92, 0.25);
-    ">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-            <div>
-                <h1 style="color: white; font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px;">
-                    📋 Reporte Consulado
-                </h1>
-                <p style="color: rgba(255,255,255,0.9); font-size: 15px; margin: 4px 0 0 0;">
-                    Atenciones y servicios al Consulado de Guatemala
-                </p>
-            </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <span style="background: rgba(255,255,255,0.2); color: white; padding: 6px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">v1.0</span>
-                <span style="background: rgba(46, 204, 113, 0.3); color: #2ecc71; padding: 6px 16px; border-radius: 30px; font-size: 13px; font-weight: 600; border: 1px solid rgba(46, 204, 113, 0.3);">● Active</span>
+def render_banner(colors):
+    banner_base64 = get_banner_base64()
+    
+    if banner_base64:
+        st.markdown(f"""
+        <div class="banner-container">
+            <img src="{banner_base64}" alt="Reporte Consulado" style="width: 100%; height: auto; display: block;">
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown(f"""
+        <div style="
+            background: linear-gradient(135deg, {colors['banner_grad1']}, {colors['banner_grad2']});
+            padding: 40px 50px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 25px {colors['shadow']};
+            animation: fadeInUp 0.5s ease-out;
+        ">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h1 style="color: white; font-size: 34px; font-weight: 800; margin: 0; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        📋 Reporte Consulado
+                    </h1>
+                    <p style="color: rgba(255,255,255,0.95); font-size: 17px; margin: 6px 0 0 0; font-weight: 500;">
+                        Atenciones y servicios al Consulado de Guatemala
+                    </p>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <span style="
+                        background: rgba(255,255,255,0.2);
+                        color: white;
+                        padding: 8px 22px;
+                        border-radius: 30px;
+                        font-size: 14px;
+                        font-weight: 700;
+                        backdrop-filter: blur(4px);
+                    ">v1.0</span>
+                    <span style="
+                        background: rgba(46, 204, 113, 0.3);
+                        color: #2ecc71;
+                        padding: 8px 22px;
+                        border-radius: 30px;
+                        font-size: 14px;
+                        font-weight: 700;
+                        border: 1px solid rgba(46, 204, 113, 0.3);
+                        backdrop-filter: blur(4px);
+                        animation: pulse 2s infinite;
+                    ">● Active</span>
+                </div>
             </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
 # ============================================================
-# SIDEBAR
+# CONFIGURACIÓN Y RENDERIZADO PRINCIPAL
+# ============================================================
+
+colors = get_colors(st.session_state.dark_mode)
+inject_css(colors)
+render_banner(colors)
+
+# ============================================================
+# BARRA LATERAL
 # ============================================================
 
 with st.sidebar:
-    st.markdown("""
+    st.markdown(f"""
     <div class="sidebar-title">
         <div class="main">📋 Reporte</div>
         <div class="sub">CONSULADO</div>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="sidebar-section">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="icon">🌙</span>
+            <span class="label">Modo oscuro</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    dark_mode_toggle = st.toggle("", value=st.session_state.dark_mode, label_visibility="collapsed")
+    if dark_mode_toggle != st.session_state.dark_mode:
+        st.session_state.dark_mode = dark_mode_toggle
+        st.rerun()
     
     st.markdown("""
     <div class="sidebar-section">
@@ -932,7 +1010,12 @@ with st.sidebar:
     test_mode = st.checkbox("", label_visibility="collapsed")
     
     st.markdown("---")
-    enviar_btn = st.button("📨 Enviar Reporte", type="primary", use_container_width=True)
+    
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        enviar_reales = st.button("📨 Enviar", type="primary", use_container_width=True)
+    with col_btn2:
+        simular = st.button("📄 Simular", use_container_width=True)
     
     st.markdown("---")
     st.caption("🔒 TLS seguro · Sin almacenamiento")
@@ -942,32 +1025,31 @@ with st.sidebar:
 # ============================================================
 
 if uploaded_file is not None:
-    df_preview = pd.read_excel(uploaded_file)
+    df = pd.read_excel(uploaded_file)
     
-    st.success(f"✅ Archivo cargado: {uploaded_file.name}")
+    st.markdown(f"<div class='text-large text-dark' style='font-weight: 700; font-size: 20px; margin-bottom: 16px;'>📊 Resumen de datos</div>", unsafe_allow_html=True)
     
-    col_m1, col_m2, col_m3 = st.columns(3)
+    col_m1, col_m2, col_m3, col_m4 = st.columns(4)
     
     with col_m1:
         st.markdown(f"""
-        <div class="metric-container animate animate-delay-1">
-            <div class="metric-value">{len(df_preview)}</div>
+        <div class="metric-container metric-blue animate animate-delay-1">
+            <div class="metric-value">{len(df)}</div>
             <div class="metric-label">Registros</div>
         </div>
         """, unsafe_allow_html=True)
     
     with col_m2:
         fecha_col = None
-        for col in df_preview.columns:
+        for col in df.columns:
             if 'date' in str(col).lower():
                 fecha_col = col
                 break
         if fecha_col is None:
-            fecha_col = df_preview.columns[0]
-        
-        fechas_unicas = df_preview[fecha_col].nunique()
+            fecha_col = df.columns[0]
+        fechas_unicas = df[fecha_col].nunique()
         st.markdown(f"""
-        <div class="metric-container animate animate-delay-2">
+        <div class="metric-container metric-purple animate animate-delay-2">
             <div class="metric-value">{fechas_unicas}</div>
             <div class="metric-label">Fechas</div>
         </div>
@@ -975,14 +1057,22 @@ if uploaded_file is not None:
     
     with col_m3:
         st.markdown(f"""
-        <div class="metric-container animate animate-delay-3">
+        <div class="metric-container metric-yellow animate animate-delay-3">
             <div class="metric-value">{datetime.now().strftime('%d/%m')}</div>
             <div class="metric-label">Hoy</div>
         </div>
         """, unsafe_allow_html=True)
     
+    with col_m4:
+        st.markdown(f"""
+        <div class="metric-container metric-green animate animate-delay-4">
+            <div class="metric-value">{datetime.now().year}</div>
+            <div class="metric-label">Año</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
     with st.expander("👁️ Vista previa de datos"):
-        st.dataframe(df_preview.head(10), use_container_width=True)
+        st.dataframe(df.head(10), use_container_width=True)
     
     st.subheader("📅 Seleccionar período")
     
@@ -1023,55 +1113,50 @@ if uploaded_file is not None:
             'dia_fin': dia_fin, 'mes_fin': mes_fin, 'año_fin': año_fin
         }
     
-    if enviar_btn:
-        if not smtp_username or not smtp_password:
-            st.error("❌ Por favor ingresa tus credenciales de Outlook")
+    if enviar_reales or simular:
+        if enviar_reales and (not smtp_username or not smtp_password):
+            st.error("⚠️ Ingresa tus credenciales de Outlook para enviar correos reales")
         else:
-            to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
-            cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
+            with st.spinner("⏳ Procesando reporte..."):
+                tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
+                success, msg = procesar_reporte(
+                    uploaded_file, tipo, fecha_params,
+                    smtp_username, smtp_password,
+                    to_emails, cc_emails,
+                    test_mode
+                )
             
-            if not to_emails:
-                st.error("❌ Debes especificar al menos un destinatario")
+            st.markdown("---")
+            st.markdown(f"<div style='font-weight: 700; color: {colors['text_primary']}; font-size: 20px;'>📋 Resultados</div>", unsafe_allow_html=True)
+            
+            if success:
+                st.success(msg)
+                if test_mode:
+                    st.info("🔬 Modo prueba activo: El correo se envió solo a tu cuenta")
+                else:
+                    st.balloons()
             else:
-                with st.spinner("⏳ Procesando y enviando reporte..."):
-                    tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
-                    
-                    success, msg = procesar_reporte(
-                        uploaded_file, tipo, fecha_params,
-                        smtp_username, smtp_password,
-                        to_emails, cc_emails,
-                        test_mode
-                    )
-                    
-                    if success:
-                        st.success(msg)
-                        if test_mode:
-                            st.info("🔬 Modo prueba activo: El correo se envió solo a tu cuenta")
-                        else:
-                            st.balloons()
-                    else:
-                        st.error(msg)
+                st.error(msg)
 
 else:
-    st.markdown("""
+    st.markdown(f"""
     <div style="
         text-align: center;
-        padding: 80px 30px;
-        background-color: #ffffff;
+        padding: 100px 30px;
+        background-color: {colors['card_bg']};
         border-radius: 14px;
-        border: 2px dashed #d5dde6;
+        border: 2px dashed {colors['card_border']};
         animation: fadeInUp 0.6s ease-out;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     ">
-        <div style="font-size: 64px; margin-bottom: 20px;">📂</div>
-        <h2 style="color: #1a2a3a; font-weight: 800; margin: 0; font-size: 26px;">Carga tu archivo Excel</h2>
-        <p style="color: #4a5a6a; margin: 12px 0 0 0; font-size: 16px;">
+        <div style="font-size: 72px; margin-bottom: 24px;">📂</div>
+        <h2 style="color: {colors['text_primary']}; font-weight: 800; margin: 0; font-size: 28px;">Carga tu archivo Excel</h2>
+        <p style="color: {colors['text_secondary']}; margin: 12px 0 0 0; font-size: 17px;">
             Sube el archivo con los registros de atención del consulado
         </p>
-        <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <span style="background: #f0f4f8; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">MM/DD/YYYY</span>
-            <span style="background: #f0f4f8; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Fecha</span>
-            <span style="background: #f0f4f8; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Atenciones</span>
+        <div style="margin-top: 20px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <span style="background: {colors['metric_bg']}; padding: 6px 20px; border-radius: 30px; font-size: 14px; font-weight: 600; color: {colors['text_secondary']};">MM/DD/YYYY</span>
+            <span style="background: {colors['metric_bg']}; padding: 6px 20px; border-radius: 30px; font-size: 14px; font-weight: 600; color: {colors['text_secondary']};">Fecha</span>
+            <span style="background: {colors['metric_bg']}; padding: 6px 20px; border-radius: 30px; font-size: 14px; font-weight: 600; color: {colors['text_secondary']};">Atenciones</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1080,10 +1165,10 @@ else:
 # FOOTER
 # ============================================================
 
-st.markdown("""
+st.markdown(f"""
 <div class="footer">
-    <strong style="color: #1a2a3a;">Reporte Consulado</strong> · Community Law Group
+    <strong style="color: {colors['text_primary']};">Reporte Consulado</strong> · Community Law Group
     <br>
-    © 2026 · Data &amp; Efficiency Team
+    © {datetime.now().year} · Data &amp; Efficiency Team
 </div>
 """, unsafe_allow_html=True)
