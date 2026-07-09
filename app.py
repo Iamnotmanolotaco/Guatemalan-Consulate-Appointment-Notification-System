@@ -441,7 +441,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# PALETA DE COLORES (USCIS)
+# PALETA DE COLORES
 # ============================================================
 
 def get_colors(dark_mode=False):
@@ -453,7 +453,7 @@ def get_colors(dark_mode=False):
             "text_primary": "#e8edf2",
             "text_secondary": "#8a9bb0",
             "text_dark": "#f0f4f8",
-            "text_sidebar": "#ffffff",
+            "text_sidebar": "#ffffff",  # Texto blanco en modo oscuro
             "sidebar_bg": "#0d1117",
             "blue": "#4a8bc2",
             "blue_dark": "#2a5a7a",
@@ -486,7 +486,7 @@ def get_colors(dark_mode=False):
             "text_primary": "#1a2a3a",
             "text_secondary": "#4a5a6a",
             "text_dark": "#0d1a2a",
-            "text_sidebar": "#1a2a3a",
+            "text_sidebar": "#1a2a3a",  # Texto oscuro en modo claro
             "sidebar_bg": "#f0f4f8",
             "blue": "#1a4a7a",
             "blue_dark": "#0d2a4a",
@@ -527,7 +527,7 @@ if 'dark_mode' not in st.session_state:
     st.session_state.dark_mode = False
 
 # ============================================================
-# CSS DE LA INTERFAZ (USCIS)
+# CSS DE LA INTERFAZ - CON TEXTO LEGIBLE EN SIDEBAR
 # ============================================================
 
 def inject_css(colors):
@@ -562,75 +562,27 @@ def inject_css(colors):
         .animate-delay-3 {{ animation-delay: 0.3s; }}
         .animate-delay-4 {{ animation-delay: 0.4s; }}
         
+        /* ============================================================
+           BARRA LATERAL - FORZADA A CLARA O CON TEXTO LEGIBLE
+           ============================================================ */
         .css-1d391kg {{
             background: linear-gradient(180deg, {colors['sidebar_grad1']}, {colors['sidebar_grad2']}) !important;
             border-right: 2px solid {colors['blue']} !important;
             animation: fadeInUp 0.5s ease-out;
         }}
         
+        /* Todos los textos en la barra lateral */
         .css-1d391kg .stMarkdown,
         .css-1d391kg .stText,
         .css-1d391kg .stCaption,
         .css-1d391kg label,
-        .css-1d391kg .stMarkdown p {{
+        .css-1d391kg .stMarkdown p,
+        .css-1d391kg div,
+        .css-1d391kg span {{
             color: {colors['text_sidebar']} !important;
         }}
         
-        .sidebar-title {{
-            text-align: center;
-            padding: 16px 0 12px 0;
-            border-bottom: 2px solid {colors['blue']};
-            margin-bottom: 16px;
-            animation: pulse 3s infinite;
-        }}
-        
-        .sidebar-title .main {{
-            font-weight: 800;
-            color: {colors['text_sidebar']};
-            font-size: 24px;
-            letter-spacing: -0.3px;
-        }}
-        
-        .sidebar-title .sub {{
-            font-size: 12px;
-            color: {colors['text_secondary']};
-            letter-spacing: 1.5px;
-            font-weight: 600;
-        }}
-        
-        .sidebar-section {{
-            background: rgba(255,255,255,0.06);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.6s ease-out;
-        }}
-        
-        .sidebar-section:hover {{
-            background: rgba(255,255,255,0.10);
-            border-color: {colors['blue']};
-            transform: translateX(4px);
-        }}
-        
-        .sidebar-section .icon {{
-            font-size: 18px;
-            margin-right: 8px;
-        }}
-        
-        .sidebar-section .label {{
-            font-weight: 700;
-            color: {colors['text_sidebar']};
-            font-size: 14px;
-        }}
-        
-        .sidebar-section .desc {{
-            font-size: 12px;
-            color: {colors['text_secondary']};
-            margin-top: 2px;
-        }}
-        
+        /* Inputs en la barra lateral */
         .css-1d391kg .stTextInput > div > div > input {{
             background-color: {colors['card_bg']} !important;
             color: {colors['text_sidebar']} !important;
@@ -639,12 +591,6 @@ def inject_css(colors):
             padding: 10px 14px !important;
             font-size: 14px !important;
             font-weight: 500 !important;
-            transition: all 0.3s ease !important;
-        }}
-        
-        .css-1d391kg .stTextInput > div > div > input:focus {{
-            border-color: {colors['blue']} !important;
-            box-shadow: 0 0 20px rgba(74, 139, 194, 0.2) !important;
         }}
         
         .css-1d391kg .stTextInput > div > div > input::placeholder {{
@@ -652,14 +598,17 @@ def inject_css(colors):
             opacity: 0.7 !important;
         }}
         
-        .css-1d391kg .stDateInput > div > div > input {{
+        .css-1d391kg .stTextInput > div > div > input:focus {{
+            border-color: {colors['blue']} !important;
+            box-shadow: 0 0 20px rgba(74, 139, 194, 0.2) !important;
+        }}
+        
+        .css-1d391kg .stTextArea > div > div > textarea {{
             background-color: {colors['card_bg']} !important;
             color: {colors['text_sidebar']} !important;
             border-color: {colors['card_border']} !important;
             border-radius: 8px !important;
-            padding: 10px 14px !important;
             font-size: 14px !important;
-            font-weight: 500 !important;
         }}
         
         .css-1d391kg .stFileUploader > div > button {{
@@ -725,6 +674,70 @@ def inject_css(colors):
             opacity: 0.3 !important;
         }}
         
+        /* ============================================================
+           TÍTULO DE LA BARRA LATERAL
+           ============================================================ */
+        .sidebar-title {{
+            text-align: center;
+            padding: 16px 0 12px 0;
+            border-bottom: 2px solid {colors['blue']};
+            margin-bottom: 16px;
+            animation: pulse 3s infinite;
+        }}
+        
+        .sidebar-title .main {{
+            font-weight: 800;
+            color: {colors['text_sidebar']};
+            font-size: 24px;
+            letter-spacing: -0.3px;
+        }}
+        
+        .sidebar-title .sub {{
+            font-size: 12px;
+            color: {colors['text_secondary']};
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }}
+        
+        /* ============================================================
+           SECCIONES DE LA BARRA LATERAL
+           ============================================================ */
+        .sidebar-section {{
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }}
+        
+        .sidebar-section:hover {{
+            background: rgba(255,255,255,0.10);
+            border-color: {colors['blue']};
+            transform: translateX(4px);
+        }}
+        
+        .sidebar-section .icon {{
+            font-size: 18px;
+            margin-right: 8px;
+        }}
+        
+        .sidebar-section .label {{
+            font-weight: 700;
+            color: {colors['text_sidebar']};
+            font-size: 14px;
+        }}
+        
+        .sidebar-section .desc {{
+            font-size: 12px;
+            color: {colors['text_secondary']};
+            margin-top: 2px;
+        }}
+        
+        /* ============================================================
+           MÉTRICAS
+           ============================================================ */
         .metric-container {{
             border-radius: 12px;
             padding: 18px 16px;
@@ -778,6 +791,9 @@ def inject_css(colors):
         .metric-purple .metric-label {{ color: {colors['purple']}; }}
         .metric-purple {{ border-color: {colors['purple']}; }}
         
+        /* ============================================================
+           RESULTADOS
+           ============================================================ */
         .result-success {{
             background-color: rgba(46, 204, 113, 0.10);
             border-left: 6px solid {colors['green']};
@@ -814,6 +830,9 @@ def inject_css(colors):
             animation: slideIn 0.4s ease-out;
         }}
         
+        /* ============================================================
+           FOOTER
+           ============================================================ */
         .footer {{
             text-align: center;
             padding: 20px;
@@ -824,6 +843,9 @@ def inject_css(colors):
             animation: fadeInUp 0.6s ease-out;
         }}
         
+        /* ============================================================
+           TEXTOS GENERALES
+           ============================================================ */
         h1, h2, h3, h4, h5, h6 {{
             color: {colors['text_primary']} !important;
             font-weight: 700 !important;
