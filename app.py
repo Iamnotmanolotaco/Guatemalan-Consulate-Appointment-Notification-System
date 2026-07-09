@@ -428,34 +428,45 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS FORZADO A CLARO
+# CSS - ESTRUCTURA USCIS (FONDOS BLANCOS)
 # ============================================================
 
 st.markdown("""
 <style>
-    /* ============================================================
-       OCULTAR ELEMENTOS
-       ============================================================ */
+    /* Ocultar elementos de Streamlit */
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
     /* ============================================================
-       FORZAR TODOS LOS FONDOS A CLARO
+       FONDO GENERAL - BLANCO
        ============================================================ */
-    .stApp, .stApp > div, .main, .main > div, .block-container {
-        background-color: #e8edf2 !important;
+    .stApp {
+        background-color: #f0f4f8 !important;
+    }
+    
+    .stApp > div {
+        background-color: #f0f4f8 !important;
+    }
+    
+    .main > div {
+        background-color: #f0f4f8 !important;
+    }
+    
+    .block-container {
+        background-color: #f0f4f8 !important;
+        padding-top: 2rem !important;
     }
     
     /* ============================================================
        BARRA LATERAL - CLARA
        ============================================================ */
     section[data-testid="stSidebar"] {
-        background-color: #f0f4f8 !important;
+        background-color: #ffffff !important;
         border-right: 2px solid #1a4a7a !important;
     }
     
     section[data-testid="stSidebar"] > div {
-        background-color: #f0f4f8 !important;
+        background-color: #ffffff !important;
     }
     
     section[data-testid="stSidebar"] * {
@@ -474,31 +485,32 @@ st.markdown("""
     
     /* Inputs en barra lateral */
     section[data-testid="stSidebar"] .stTextInput > div > div > input {
-        background-color: #ffffff !important;
+        background-color: #f5f8fc !important;
         color: #1a2a3a !important;
         border-color: #c8d0d8 !important;
         border-radius: 8px !important;
         padding: 10px 14px !important;
         font-size: 14px !important;
-        font-weight: 500 !important;
-    }
-    
-    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
-        color: #8a9bb0 !important;
-        opacity: 0.7 !important;
-    }
-    
-    section[data-testid="stSidebar"] .stTextInput > div > div > input:focus {
-        border-color: #1a4a7a !important;
-        box-shadow: 0 0 20px rgba(26, 74, 122, 0.15) !important;
     }
     
     section[data-testid="stSidebar"] .stTextArea > div > div > textarea {
-        background-color: #ffffff !important;
+        background-color: #f5f8fc !important;
         color: #1a2a3a !important;
         border-color: #c8d0d8 !important;
         border-radius: 8px !important;
         font-size: 14px !important;
+    }
+    
+    section[data-testid="stSidebar"] .stFileUploader > div > button {
+        background-color: #1a4a7a !important;
+        color: white !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        border: none !important;
+    }
+    
+    section[data-testid="stSidebar"] .stFileUploader > div > button:hover {
+        background-color: #0d2a4a !important;
     }
     
     section[data-testid="stSidebar"] .stCheckbox label {
@@ -512,10 +524,10 @@ st.markdown("""
         font-weight: 700 !important;
         font-size: 15px !important;
         padding: 10px 16px !important;
-        transition: all 0.3s ease !important;
         border: none !important;
         background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
         color: white !important;
+        transition: all 0.3s ease !important;
     }
     
     section[data-testid="stSidebar"] .stButton > button:hover {
@@ -563,16 +575,16 @@ st.markdown("""
        SECCIONES DE LA BARRA LATERAL
        ============================================================ */
     .sidebar-section {
-        background: rgba(26, 74, 122, 0.06) !important;
+        background: rgba(26, 74, 122, 0.04) !important;
         border-radius: 10px;
         padding: 12px 16px;
         margin-bottom: 12px;
-        border: 1px solid rgba(26, 74, 122, 0.10) !important;
+        border: 1px solid rgba(26, 74, 122, 0.08) !important;
         transition: all 0.3s ease;
     }
     
     .sidebar-section:hover {
-        background: rgba(26, 74, 122, 0.10) !important;
+        background: rgba(26, 74, 122, 0.08) !important;
         border-color: #1a4a7a !important;
         transform: translateX(4px);
     }
@@ -608,75 +620,37 @@ st.markdown("""
     .animate-delay-3 { animation-delay: 0.3s; }
     
     /* ============================================================
-       FILE UPLOADER - FORZADO A CLARO (BOTÓN)
+       TARJETAS - FONDO BLANCO
        ============================================================ */
-    .stFileUploader > div {
+    div[data-testid="stExpander"] {
         background-color: #ffffff !important;
-        border: 2px dashed #c8d0d8 !important;
-        border-radius: 10px !important;
-        padding: 20px !important;
-    }
-    
-    .stFileUploader > div:hover {
-        border-color: #1a4a7a !important;
-    }
-    
-    .stFileUploader > div > button {
-        background-color: #1a4a7a !important;
-        color: white !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        border: none !important;
-        padding: 8px 20px !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stFileUploader > div > button:hover {
-        background-color: #0d2a4a !important;
-        transform: scale(1.02) !important;
-    }
-    
-    /* Texto del file uploader */
-    .stFileUploader > div > div {
-        color: #1a2a3a !important;
-    }
-    
-    .stFileUploader > div > small {
-        color: #4a5a6a !important;
-    }
-    
-    /* ============================================================
-       TARJETAS - FONDO CLARO
-       ============================================================ */
-    .card {
-        background-color: #ffffff !important;
-        border-radius: 14px;
-        padding: 22px 26px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+        border-radius: 12px !important;
         border: 1px solid #e8edf2 !important;
-        margin-bottom: 16px;
-        animation: fadeInUp 0.5s ease-out;
-        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
     }
     
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08) !important;
-    }
-    
-    .card * {
+    .streamlit-expanderHeader {
+        background-color: #ffffff !important;
         color: #1a2a3a !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .streamlit-expanderContent {
+        background-color: #ffffff !important;
+        border-radius: 0 0 12px 12px !important;
     }
     
     /* ============================================================
-       MÉTRICAS - FONDO CLARO
+       MÉTRICAS - FONDO BLANCO
        ============================================================ */
     .metric-container {
         background-color: #ffffff !important;
         border-radius: 12px;
-        padding: 18px 16px;
+        padding: 20px 16px;
         text-align: center;
-        border: 2px solid #e8edf2 !important;
+        border: 1px solid #e8edf2 !important;
         transition: all 0.3s ease;
         animation: fadeInUp 0.5s ease-out;
         min-height: 90px;
@@ -708,32 +682,21 @@ st.markdown("""
     }
     
     /* ============================================================
-       EXPANDER - FONDO CLARO
+       DATA FRAME - FONDO BLANCO
        ============================================================ */
-    .streamlit-expanderHeader {
-        background-color: #ffffff !important;
-        color: #1a2a3a !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        border-radius: 8px !important;
-        border: 1px solid #e8edf2 !important;
-    }
-    
-    .streamlit-expanderContent {
-        background-color: #ffffff !important;
-        border: 1px solid #e8edf2 !important;
-        border-top: none !important;
-        border-radius: 0 0 8px 8px !important;
-    }
-    
-    /* ============================================================
-       DATA FRAME - FONDO CLARO
-       ============================================================ */
-    .stDataFrame, .stDataFrame > div, .stDataFrame table {
+    .stDataFrame {
         background-color: #ffffff !important;
         border-radius: 10px !important;
         overflow: hidden !important;
         border: 1px solid #e8edf2 !important;
+    }
+    
+    .stDataFrame > div {
+        background-color: #ffffff !important;
+    }
+    
+    .stDataFrame table {
+        background-color: #ffffff !important;
     }
     
     .stDataFrame th {
@@ -747,17 +710,17 @@ st.markdown("""
     }
     
     /* ============================================================
-       BOTONES EN ÁREA PRINCIPAL
+       BOTÓN EN ÁREA PRINCIPAL
        ============================================================ */
     .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
         font-size: 16px !important;
         padding: 10px 24px !important;
-        transition: all 0.3s ease !important;
         border: none !important;
         background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
         color: white !important;
+        transition: all 0.3s ease !important;
     }
     
     .stButton > button:hover {
@@ -791,6 +754,32 @@ st.markdown("""
     }
     
     /* ============================================================
+       FILE UPLOADER
+       ============================================================ */
+    .stFileUploader > div {
+        background-color: #ffffff !important;
+        border: 2px dashed #c8d0d8 !important;
+        border-radius: 10px !important;
+        padding: 20px !important;
+    }
+    
+    .stFileUploader > div:hover {
+        border-color: #1a4a7a !important;
+    }
+    
+    .stFileUploader > div > button {
+        background-color: #1a4a7a !important;
+        color: white !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        border: none !important;
+    }
+    
+    .stFileUploader > div > button:hover {
+        background-color: #0d2a4a !important;
+    }
+    
+    /* ============================================================
        FOOTER
        ============================================================ */
     .footer {
@@ -812,10 +801,6 @@ st.markdown("""
     
     .stMarkdown, .stText, .stCaption, label {
         color: #4a5a6a !important;
-    }
-    
-    .stSpinner > div {
-        border-color: #1a4a7a !important;
     }
     
     .stAlert {
@@ -1074,7 +1059,7 @@ else:
         padding: 80px 30px;
         background-color: #ffffff;
         border-radius: 14px;
-        border: 2px dashed #e8edf2;
+        border: 2px dashed #d5dde6;
         animation: fadeInUp 0.6s ease-out;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     ">
@@ -1084,9 +1069,9 @@ else:
             Sube el archivo con los registros de atención del consulado
         </p>
         <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">MM/DD/YYYY</span>
-            <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Fecha</span>
-            <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Atenciones</span>
+            <span style="background: #f0f4f8; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">MM/DD/YYYY</span>
+            <span style="background: #f0f4f8; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Fecha</span>
+            <span style="background: #f0f4f8; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Atenciones</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
