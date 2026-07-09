@@ -1,5 +1,5 @@
 # consulate_report_app.py
-# Reporte de Atenciones - Consulado (versión Streamlit con diseño USCIS)
+# Reporte de Atenciones - Consulado (versión Streamlit)
 
 import streamlit as st
 import pandas as pd
@@ -9,10 +9,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 import base64
-from datetime import datetime, timedelta
-import os
+from datetime import datetime
 import requests
-from io import BytesIO
 
 # ============================================================
 # CONFIGURACIÓN
@@ -25,19 +23,18 @@ SMTP_PORT = 587
 URL_LOGO_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/logo.png"
 URL_BANNER_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/banner.png"
 
-# Datos de contacto para la firma
+# Datos de contacto
 NOMBRE_EMPRESA = "Community Law Group, PLLC® "
 DEPARTAMENTO = "Quality Control & Efficiency Department"
 TELEFONO = "+1 (615) 913-5576"
 EMAIL_CONTACTO = "executiveassistant2@communitylawgroup.com"
 SITIO_WEB = "www.communitylawgroup.com"
 
-# Destinatarios (por defecto)
+# Destinatarios
 DEFAULT_TO = ["consnashville@minex.gob.gt"]
 DEFAULT_CC = ["lsillescas@minex.gob.gt", "dataprojects@communitylawgroup.com", 
               "executiveassistant2@communitylawgroup.com", "data.analyst7@communitylawgroup.com"]
 
-# Tamaño del logo
 TAMANO_LOGO = 190
 
 MESES = {
@@ -136,9 +133,6 @@ def generar_html_reporte(datos, tipo_reporte, logo_cid=None):
         </tr>
         """
     
-    # ============================================================
-    # Logo HTML con CID - CORREGIDO
-    # ============================================================
     logo_html = ""
     if logo_cid:
         logo_html = f"""
@@ -307,7 +301,7 @@ def generar_html_reporte(datos, tipo_reporte, logo_cid=None):
     return html
 
 # ============================================================
-# FUNCIÓN PARA ENVIAR CORREO - CON LOGO CORREGIDO
+# FUNCIÓN PARA ENVIAR CORREO
 # ============================================================
 
 def enviar_correo(smtp_username, smtp_password, to_emails, cc_emails, 
@@ -321,31 +315,21 @@ def enviar_correo(smtp_username, smtp_password, to_emails, cc_emails,
             msg['CC'] = ", ".join(cc_emails)
         msg['X-Priority'] = '1'
         
-        # Parte HTML
         html_part = MIMEText(html_body, 'html')
         msg.attach(html_part)
         
-        # ============================================================
-        # FIX: Adjuntar logo con CID correctamente
-        # ============================================================
         if logo_bytes:
             try:
                 logo_cid = "company_logo_cid"
                 image_part = MIMEImage(logo_bytes)
-                # Configurar Content-ID correctamente (con < >)
                 image_part.add_header('Content-ID', f'<{logo_cid}>')
                 image_part.add_header('Content-Disposition', 'inline', filename='logo.png')
-                # Forzar que Outlook lo reconozca como imagen
                 image_part.add_header('X-Attachment-Id', logo_cid)
                 msg.attach(image_part)
-                print("🖼️ Logo adjuntado correctamente con CID")
+                print("🖼️ Logo adjuntado correctamente")
             except Exception as e:
                 print(f"⚠️ Error al adjuntar logo: {e}")
-        else:
-            print("⚠️ No se pudo obtener el logo para adjuntar")
-        # ============================================================
         
-        # Enviar
         context = ssl.create_default_context()
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls(context=context)
@@ -376,14 +360,8 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         if len(df) == 0:
             return False, "❌ No se encontraron fechas válidas en el archivo"
         
-        # Obtener logo para el correo
         logo_bytes = get_logo_bytes()
         logo_cid = "company_logo_cid" if logo_bytes else None
-        
-        if logo_bytes:
-            print(f"✅ Logo obtenido: {len(logo_bytes)} bytes")
-        else:
-            print("⚠️ No se pudo obtener el logo para el correo")
         
         if tipo_reporte == 'dia':
             dia = fecha_params['dia']
@@ -425,10 +403,8 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
             else:
                 asunto = f"Reporte de atenciones - {dia_ini} de {MESES[mes_ini]} de {año_ini} al {dia_fin} de {MESES[mes_fin]} de {año_fin}"
         
-        # Generar HTML
         html_body = generar_html_reporte(datos, tipo_reporte, logo_cid)
         
-        # Enviar correo
         if test_mode:
             to_emails = [smtp_username]
             cc_emails = []
@@ -447,427 +423,351 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# PALETA DE COLORES (misma que USCIS)
-# ============================================================
-
-def get_colors(dark_mode=False):
-    if dark_mode:
-        return {
-            "bg": "#0a0e14",
-            "card_bg": "#161a22",
-            "card_border": "#2a303a",
-            "text_primary": "#e8edf2",
-            "text_secondary": "#8a9bb0",
-            "text_dark": "#f0f4f8",
-            "text_sidebar": "#ffffff",
-            "blue": "#4a8bc2",
-            "blue_dark": "#2a5a7a",
-            "red": "#e74c3c",
-            "red_dark": "#a93226",
-            "yellow": "#f1c40f",
-            "yellow_dark": "#b7950b",
-            "green": "#2ecc71",
-            "green_dark": "#1a7a42",
-            "purple": "#8e44ad",
-            "urgent": "#e74c3c",
-            "warning": "#f39c12",
-            "success": "#2ecc71",
-            "info": "#3498db",
-            "banner_grad1": "#1a2744",
-            "banner_grad2": "#2a4a6a",
-            "metric_bg": "#1c2430",
-            "shadow": "rgba(0,0,0,0.6)",
-            "sidebar_grad1": "#0d1117",
-            "sidebar_grad2": "#161a22"
-        }
-    else:
-        return {
-            "bg": "#e8edf2",
-            "card_bg": "#ffffff",
-            "card_border": "#c8d0d8",
-            "text_primary": "#1a2a3a",
-            "text_secondary": "#4a5a6a",
-            "text_dark": "#0d1a2a",
-            "text_sidebar": "#1a2a3a",
-            "blue": "#1a4a7a",
-            "blue_dark": "#0d2a4a",
-            "red": "#c0392b",
-            "red_dark": "#922b21",
-            "yellow": "#d4ac0d",
-            "yellow_dark": "#9a7d0a",
-            "green": "#1e8449",
-            "green_dark": "#145a32",
-            "purple": "#6c3483",
-            "urgent": "#c0392b",
-            "warning": "#e67e22",
-            "success": "#27ae60",
-            "info": "#1e40af",
-            "banner_grad1": "#1a3a5c",
-            "banner_grad2": "#4a7c9c",
-            "metric_bg": "#eef2f6",
-            "shadow": "rgba(0,0,0,0.1)",
-            "sidebar_grad1": "#e8edf2",
-            "sidebar_grad2": "#d5dde6"
-        }
-
-# ============================================================
-# INTERFAZ STREAMLIT - CON DISEÑO USCIS
+# INTERFAZ STREAMLIT - SIN MODO OSCURO
 # ============================================================
 
 st.set_page_config(
     page_title="Reporte Consulado",
     page_icon="📋",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
-
-# Inicializar estado
-if 'dark_mode' not in st.session_state:
-    st.session_state.dark_mode = False
-
-# Obtener colores
-colors = get_colors(st.session_state.dark_mode)
-
-# ============================================================
-# CSS CON ANIMACIONES Y COLORES (mismo que USCIS)
-# ============================================================
-
-def inject_css(colors):
-    st.markdown(f"""
-    <style>
-        #MainMenu {{ visibility: hidden; }}
-        footer {{ visibility: hidden; }}
-        
-        .stApp {{
-            background-color: {colors['bg']};
-        }}
-        
-        @keyframes fadeInUp {{
-            from {{ opacity: 0; transform: translateY(20px); }}
-            to {{ opacity: 1; transform: translateY(0); }}
-        }}
-        
-        @keyframes pulse {{
-            0% {{ transform: scale(1); }}
-            50% {{ transform: scale(1.03); }}
-            100% {{ transform: scale(1); }}
-        }}
-        
-        @keyframes slideIn {{
-            from {{ opacity: 0; transform: translateX(-20px); }}
-            to {{ opacity: 1; transform: translateX(0); }}
-        }}
-        
-        .animate {{ animation: fadeInUp 0.6s ease-out; }}
-        .animate-delay-1 {{ animation-delay: 0.1s; }}
-        .animate-delay-2 {{ animation-delay: 0.2s; }}
-        .animate-delay-3 {{ animation-delay: 0.3s; }}
-        
-        .css-1d391kg {{
-            background: linear-gradient(180deg, {colors['sidebar_grad1']}, {colors['sidebar_grad2']}) !important;
-            border-right: 2px solid {colors['blue']} !important;
-            animation: fadeInUp 0.5s ease-out;
-        }}
-        
-        .css-1d391kg .stMarkdown,
-        .css-1d391kg .stText,
-        .css-1d391kg .stCaption,
-        .css-1d391kg label,
-        .css-1d391kg .stMarkdown p {{
-            color: {colors['text_sidebar']} !important;
-        }}
-        
-        .sidebar-title {{
-            text-align: center;
-            padding: 16px 0 12px 0;
-            border-bottom: 2px solid {colors['blue']};
-            margin-bottom: 16px;
-            animation: pulse 3s infinite;
-        }}
-        
-        .sidebar-title .main {{
-            font-weight: 800;
-            color: {colors['text_sidebar']};
-            font-size: 24px;
-            letter-spacing: -0.3px;
-        }}
-        
-        .sidebar-title .sub {{
-            font-size: 12px;
-            color: {colors['text_secondary']};
-            letter-spacing: 1.5px;
-            font-weight: 600;
-        }}
-        
-        .sidebar-section {{
-            background: rgba(255,255,255,0.06);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.6s ease-out;
-        }}
-        
-        .sidebar-section:hover {{
-            background: rgba(255,255,255,0.10);
-            border-color: {colors['blue']};
-            transform: translateX(4px);
-        }}
-        
-        .sidebar-section .icon {{
-            font-size: 18px;
-            margin-right: 8px;
-        }}
-        
-        .sidebar-section .label {{
-            font-weight: 700;
-            color: {colors['text_sidebar']};
-            font-size: 14px;
-        }}
-        
-        .sidebar-section .desc {{
-            font-size: 12px;
-            color: {colors['text_secondary']};
-            margin-top: 2px;
-        }}
-        
-        .css-1d391kg .stTextInput > div > div > input {{
-            background-color: {colors['card_bg']} !important;
-            color: {colors['text_sidebar']} !important;
-            border-color: {colors['card_border']} !important;
-            border-radius: 8px !important;
-            padding: 10px 14px !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            transition: all 0.3s ease !important;
-        }}
-        
-        .css-1d391kg .stTextInput > div > div > input:focus {{
-            border-color: {colors['blue']} !important;
-            box-shadow: 0 0 20px rgba(74, 139, 194, 0.2) !important;
-        }}
-        
-        .css-1d391kg .stTextInput > div > div > input::placeholder {{
-            color: {colors['text_secondary']} !important;
-            opacity: 0.7 !important;
-        }}
-        
-        .css-1d391kg .stFileUploader > div > button {{
-            background-color: {colors['card_bg']} !important;
-            color: {colors['text_sidebar']} !important;
-            border-color: {colors['card_border']} !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            transition: all 0.3s ease !important;
-        }}
-        
-        .css-1d391kg .stFileUploader > div > button:hover {{
-            background-color: {colors['blue']} !important;
-            color: white !important;
-            border-color: {colors['blue']} !important;
-        }}
-        
-        .css-1d391kg .stCheckbox label {{
-            color: {colors['text_sidebar']} !important;
-            font-weight: 600 !important;
-            font-size: 14px !important;
-        }}
-        
-        .css-1d391kg .stButton > button {{
-            border-radius: 10px !important;
-            font-weight: 700 !important;
-            font-size: 15px !important;
-            padding: 10px 16px !important;
-            transition: all 0.3s ease !important;
-            border: none !important;
-        }}
-        
-        .css-1d391kg .stButton > button {{
-            background: linear-gradient(135deg, {colors['blue']}, {colors['purple']}) !important;
-            color: white !important;
-        }}
-        
-        .css-1d391kg .stButton > button:hover {{
-            transform: translateY(-3px) !important;
-            box-shadow: 0 6px 25px rgba(74, 139, 194, 0.4) !important;
-        }}
-        
-        .card {{
-            background-color: {colors['card_bg']};
-            border-radius: 14px;
-            padding: 22px 26px;
-            box-shadow: 0 4px 12px {colors['shadow']};
-            border: 1px solid {colors['card_border']};
-            margin-bottom: 16px;
-            animation: fadeInUp 0.5s ease-out;
-            transition: all 0.3s ease;
-        }}
-        
-        .card:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px {colors['shadow']};
-        }}
-        
-        .metric-container {{
-            border-radius: 12px;
-            padding: 18px 16px;
-            text-align: center;
-            border: 2px solid {colors['card_border']};
-            background-color: {colors['metric_bg']};
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.5s ease-out;
-            min-height: 90px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }}
-        
-        .metric-value {{
-            font-size: 32px;
-            font-weight: 800;
-            line-height: 1.2;
-            color: {colors['blue']};
-        }}
-        
-        .metric-label {{
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-top: 4px;
-            color: {colors['text_secondary']};
-        }}
-        
-        .banner-container {{
-            border-radius: 14px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            animation: fadeInUp 0.5s ease-out;
-            box-shadow: 0 4px 20px {colors['shadow']};
-        }}
-        
-        .footer {{
-            text-align: center;
-            padding: 20px;
-            color: {colors['text_secondary']};
-            font-size: 13px;
-            border-top: 2px solid {colors['card_border']};
-            margin-top: 30px;
-            animation: fadeInUp 0.6s ease-out;
-        }}
-        
-        h1, h2, h3, h4, h5, h6 {{
-            color: {colors['text_primary']} !important;
-            font-weight: 700 !important;
-        }}
-        
-        .stMarkdown, .stText, .stCaption, label {{
-            color: {colors['text_secondary']} !important;
-        }}
-        
-        .streamlit-expanderHeader {{
-            color: {colors['text_primary']} !important;
-            font-weight: 700 !important;
-            font-size: 15px !important;
-            background-color: {colors['metric_bg']} !important;
-            border-radius: 8px !important;
-        }}
-        
-        .stSpinner > div {{
-            border-color: {colors['blue']} !important;
-        }}
-    </style>
-    """, unsafe_allow_html=True)
 
 # ============================================================
 # BANNER
 # ============================================================
 
-def render_banner(colors):
-    banner_base64 = get_banner_base64()
-    
-    if banner_base64:
-        st.markdown(f"""
-        <div class="banner-container">
-            <img src="{banner_base64}" alt="Reporte Consulado" style="width: 100%; height: auto; display: block;">
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown(f"""
-        <div style="
-            background: linear-gradient(135deg, {colors['banner_grad1']}, {colors['banner_grad2']});
-            padding: 35px 45px;
-            border-radius: 14px;
-            margin-bottom: 25px;
-            box-shadow: 0 6px 25px {colors['shadow']};
-            animation: fadeInUp 0.5s ease-out;
-        ">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-                <div>
-                    <h1 style="color: white; font-size: 30px; font-weight: 800; margin: 0; letter-spacing: -0.5px;">
-                        📋 Reporte Consulado
-                    </h1>
-                    <p style="color: rgba(255,255,255,0.95); font-size: 16px; margin: 6px 0 0 0; font-weight: 500;">
-                        Atenciones y servicios al Consulado de Guatemala
-                    </p>
-                </div>
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <span style="
-                        background: rgba(255,255,255,0.2);
-                        color: white;
-                        padding: 6px 18px;
-                        border-radius: 30px;
-                        font-size: 13px;
-                        font-weight: 700;
-                    ">v1.0</span>
-                    <span style="
-                        background: rgba(46, 204, 113, 0.3);
-                        color: #2ecc71;
-                        padding: 6px 18px;
-                        border-radius: 30px;
-                        font-size: 13px;
-                        font-weight: 700;
-                        border: 1px solid rgba(46, 204, 113, 0.3);
-                        animation: pulse 2s infinite;
-                    ">● Active</span>
-                </div>
+banner_base64 = get_banner_base64()
+
+if banner_base64:
+    st.markdown(f"""
+    <div style="width: 100%; margin-bottom: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+        <img src="{banner_base64}" alt="Reporte Consulado" style="width: 100%; height: auto; display: block;">
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #1a3a5c, #4a7c9c);
+        padding: 30px 40px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(26, 58, 92, 0.25);
+    ">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h1 style="color: white; font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px;">
+                    📋 Reporte Consulado
+                </h1>
+                <p style="color: rgba(255,255,255,0.9); font-size: 15px; margin: 4px 0 0 0;">
+                    Atenciones y servicios al Consulado de Guatemala
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span style="background: rgba(255,255,255,0.2); color: white; padding: 6px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">v1.0</span>
+                <span style="background: rgba(46, 204, 113, 0.3); color: #2ecc71; padding: 6px 16px; border-radius: 30px; font-size: 13px; font-weight: 600; border: 1px solid rgba(46, 204, 113, 0.3);">● Active</span>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================
-# CONFIGURACIÓN Y RENDERIZADO
+# CSS
 # ============================================================
 
-inject_css(colors)
-render_banner(colors)
+st.markdown("""
+<style>
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+    
+    .stApp {
+        background-color: #e8edf2;
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate { animation: fadeInUp 0.6s ease-out; }
+    .animate-delay-1 { animation-delay: 0.1s; }
+    .animate-delay-2 { animation-delay: 0.2s; }
+    .animate-delay-3 { animation-delay: 0.3s; }
+    
+    /* Sidebar clara */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #f0f4f8, #e8edf2) !important;
+        border-right: 2px solid #1a4a7a !important;
+    }
+    
+    .css-1d391kg .stMarkdown,
+    .css-1d391kg .stText,
+    .css-1d391kg .stCaption,
+    .css-1d391kg label,
+    .css-1d391kg .stMarkdown p {
+        color: #1a2a3a !important;
+    }
+    
+    .sidebar-title {
+        text-align: center;
+        padding: 16px 0 12px 0;
+        border-bottom: 2px solid #1a4a7a;
+        margin-bottom: 16px;
+    }
+    
+    .sidebar-title .main {
+        font-weight: 800;
+        color: #1a3a5c;
+        font-size: 24px;
+        letter-spacing: -0.3px;
+    }
+    
+    .sidebar-title .sub {
+        font-size: 12px;
+        color: #4a5a6a;
+        letter-spacing: 1.5px;
+        font-weight: 600;
+    }
+    
+    .sidebar-section {
+        background: rgba(26, 74, 122, 0.06);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        border: 1px solid rgba(26, 74, 122, 0.10);
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-section:hover {
+        background: rgba(26, 74, 122, 0.10);
+        border-color: #1a4a7a;
+        transform: translateX(4px);
+    }
+    
+    .sidebar-section .icon {
+        font-size: 18px;
+        margin-right: 8px;
+    }
+    
+    .sidebar-section .label {
+        font-weight: 700;
+        color: #1a2a3a;
+        font-size: 14px;
+    }
+    
+    .sidebar-section .desc {
+        font-size: 12px;
+        color: #4a5a6a;
+        margin-top: 2px;
+    }
+    
+    /* Inputs */
+    .stTextInput > div > div > input {
+        background-color: #ffffff !important;
+        color: #1a2a3a !important;
+        border-color: #c8d0d8 !important;
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #1a4a7a !important;
+        box-shadow: 0 0 20px rgba(26, 74, 122, 0.15) !important;
+    }
+    
+    .stTextInput > div > div > input::placeholder {
+        color: #8a9bb0 !important;
+        opacity: 0.7 !important;
+    }
+    
+    .stFileUploader > div > button {
+        background-color: #ffffff !important;
+        color: #1a2a3a !important;
+        border-color: #c8d0d8 !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+    
+    .stFileUploader > div > button:hover {
+        background-color: #1a4a7a !important;
+        color: white !important;
+        border-color: #1a4a7a !important;
+    }
+    
+    .stCheckbox label {
+        color: #1a2a3a !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+    
+    .stButton > button {
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        padding: 10px 16px !important;
+        transition: all 0.3s ease !important;
+        border: none !important;
+        background: linear-gradient(135deg, #1a4a7a, #6c3483) !important;
+        color: white !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
+    }
+    
+    .stCaption {
+        color: #4a5a6a !important;
+        font-size: 11px !important;
+        font-weight: 500 !important;
+    }
+    
+    hr {
+        border-color: #d5dde6 !important;
+        margin: 12px 0 !important;
+        opacity: 0.5 !important;
+    }
+    
+    /* Tarjetas */
+    .card {
+        background-color: #ffffff;
+        border-radius: 14px;
+        padding: 22px 26px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border: 1px solid #e8edf2;
+        margin-bottom: 16px;
+        animation: fadeInUp 0.5s ease-out;
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+    
+    /* Métricas */
+    .metric-container {
+        border-radius: 12px;
+        padding: 18px 16px;
+        text-align: center;
+        border: 2px solid #e8edf2;
+        background-color: #f5f8fc;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease-out;
+        min-height: 90px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .metric-container:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+    
+    .metric-value {
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1.2;
+        color: #1a4a7a;
+    }
+    
+    .metric-label {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 4px;
+        color: #4a5a6a;
+    }
+    
+    /* Resultados */
+    .result-success {
+        background-color: rgba(46, 204, 113, 0.10);
+        border-left: 6px solid #27ae60;
+        padding: 14px 18px;
+        border-radius: 6px;
+        margin: 6px 0;
+        color: #1a2a3a;
+        font-size: 15px;
+        font-weight: 500;
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .result-error {
+        background-color: rgba(231, 76, 60, 0.10);
+        border-left: 6px solid #c0392b;
+        padding: 14px 18px;
+        border-radius: 6px;
+        margin: 6px 0;
+        color: #1a2a3a;
+        font-size: 15px;
+        font-weight: 500;
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .result-info {
+        background-color: rgba(52, 152, 219, 0.10);
+        border-left: 6px solid #1e40af;
+        padding: 14px 18px;
+        border-radius: 6px;
+        margin: 6px 0;
+        color: #1a2a3a;
+        font-size: 15px;
+        font-weight: 500;
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 20px;
+        color: #4a5a6a;
+        font-size: 13px;
+        border-top: 2px solid #e8edf2;
+        margin-top: 30px;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: #1a2a3a !important;
+        font-weight: 700 !important;
+    }
+    
+    .stMarkdown, .stText, .stCaption, label {
+        color: #4a5a6a !important;
+    }
+    
+    .streamlit-expanderHeader {
+        color: #1a2a3a !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        background-color: #f5f8fc !important;
+        border-radius: 8px !important;
+    }
+    
+    .stSpinner > div {
+        border-color: #1a4a7a !important;
+    }
+    
+    .stDataFrame {
+        border-radius: 10px !important;
+        overflow: hidden !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # ============================================================
-# SIDEBAR - CON DISEÑO USCIS
+# SIDEBAR - CLARA Y LEGIBLE
 # ============================================================
 
 with st.sidebar:
-    st.markdown(f"""
+    st.markdown("""
     <div class="sidebar-title">
         <div class="main">📋 Reporte</div>
         <div class="sub">CONSULADO</div>
     </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="sidebar-section">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="icon">🌙</span>
-            <span class="label">Modo oscuro</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    dark_mode_toggle = st.toggle("", value=st.session_state.dark_mode, label_visibility="collapsed")
-    if dark_mode_toggle != st.session_state.dark_mode:
-        st.session_state.dark_mode = dark_mode_toggle
-        st.rerun()
     
     st.markdown("""
     <div class="sidebar-section">
@@ -935,10 +835,8 @@ with col_main:
     if uploaded_file is not None:
         st.success(f"✅ Archivo cargado: {uploaded_file.name}")
         
-        # Vista previa
         df_preview = pd.read_excel(uploaded_file)
         
-        # Métricas
         col_m1, col_m2, col_m3 = st.columns(3)
         with col_m1:
             st.markdown(f"""
@@ -949,7 +847,6 @@ with col_main:
             """, unsafe_allow_html=True)
         
         with col_m2:
-            # Detectar columna de fecha
             fecha_col = None
             for col in df_preview.columns:
                 if 'date' in str(col).lower():
@@ -977,7 +874,6 @@ with col_main:
         with st.expander("👁️ Vista previa de datos"):
             st.dataframe(df_preview.head(10), use_container_width=True)
         
-        # Selección de período
         st.subheader("📅 Seleccionar período")
         
         tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
@@ -1017,7 +913,6 @@ with col_main:
                 'dia_fin': dia_fin, 'mes_fin': mes_fin, 'año_fin': año_fin
             }
         
-        # Procesar envío
         if enviar_btn:
             if not smtp_username or not smtp_password:
                 st.error("❌ Por favor ingresa tus credenciales de Outlook")
@@ -1048,35 +943,35 @@ with col_main:
                             st.error(msg)
         
     else:
-        st.markdown(f"""
+        st.markdown("""
         <div style="
             text-align: center;
             padding: 80px 30px;
-            background-color: {colors['card_bg']};
+            background-color: #ffffff;
             border-radius: 14px;
-            border: 2px dashed {colors['card_border']};
+            border: 2px dashed #e8edf2;
             animation: fadeInUp 0.6s ease-out;
         ">
             <div style="font-size: 64px; margin-bottom: 20px;">📂</div>
-            <h2 style="color: {colors['text_primary']}; font-weight: 800; margin: 0; font-size: 26px;">Carga tu archivo Excel</h2>
-            <p style="color: {colors['text_secondary']}; margin: 12px 0 0 0; font-size: 16px;">
+            <h2 style="color: #1a2a3a; font-weight: 800; margin: 0; font-size: 26px;">Carga tu archivo Excel</h2>
+            <p style="color: #4a5a6a; margin: 12px 0 0 0; font-size: 16px;">
                 Sube el archivo con los registros de atención del consulado
             </p>
             <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <span style="background: {colors['metric_bg']}; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: {colors['text_secondary']};">MM/DD/YYYY</span>
-                <span style="background: {colors['metric_bg']}; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: {colors['text_secondary']};">Fecha</span>
-                <span style="background: {colors['metric_bg']}; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: {colors['text_secondary']};">Atenciones</span>
+                <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">MM/DD/YYYY</span>
+                <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Fecha</span>
+                <span style="background: #f5f8fc; padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #4a5a6a;">Atenciones</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
 with col_info:
-    st.markdown(f"""
+    st.markdown("""
     <div class="card">
-        <div style="font-weight: 700; color: {colors['text_primary']}; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid {colors['card_border']}; padding-bottom: 8px;">
+        <div style="font-weight: 700; color: #1a2a3a; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #e8edf2; padding-bottom: 8px;">
             📋 Instrucciones
         </div>
-        <ol style="margin: 0; padding-left: 18px; color: {colors['text_secondary']}; font-size: 14px; line-height: 2;">
+        <ol style="margin: 0; padding-left: 18px; color: #4a5a6a; font-size: 14px; line-height: 2;">
             <li>Configura tu correo</li>
             <li>Carga el archivo Excel</li>
             <li>Selecciona el período</li>
@@ -1086,10 +981,10 @@ with col_info:
     </div>
     
     <div class="card">
-        <div style="font-weight: 700; color: {colors['text_primary']}; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid {colors['card_border']}; padding-bottom: 8px;">
+        <div style="font-weight: 700; color: #1a2a3a; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #e8edf2; padding-bottom: 8px;">
             📌 Formato del Excel
         </div>
-        <ul style="margin: 0; padding-left: 18px; color: {colors['text_secondary']}; font-size: 13px; line-height: 1.8;">
+        <ul style="margin: 0; padding-left: 18px; color: #4a5a6a; font-size: 13px; line-height: 1.8;">
             <li>Fecha en formato <code>MM/DD/YYYY</code></li>
             <li>Ejemplo: <code>01/05/2026</code></li>
             <li>Columna con nombre que contenga "date"</li>
@@ -1097,10 +992,10 @@ with col_info:
     </div>
     
     <div class="card">
-        <div style="font-weight: 700; color: {colors['text_primary']}; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid {colors['card_border']}; padding-bottom: 8px;">
+        <div style="font-weight: 700; color: #1a2a3a; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #e8edf2; padding-bottom: 8px;">
             🔒 Seguridad
         </div>
-        <ul style="margin: 0; padding-left: 18px; color: {colors['text_secondary']}; font-size: 13px; line-height: 1.8;">
+        <ul style="margin: 0; padding-left: 18px; color: #4a5a6a; font-size: 13px; line-height: 1.8;">
             <li>🔐 TLS en conexión SMTP</li>
             <li>🔑 Sin almacenamiento</li>
             <li>🧪 Modo prueba disponible</li>
@@ -1112,10 +1007,10 @@ with col_info:
 # FOOTER
 # ============================================================
 
-st.markdown(f"""
+st.markdown("""
 <div class="footer">
-    <strong style="color: {colors['text_primary']};">Reporte Consulado</strong> · Community Law Group
+    <strong style="color: #1a2a3a;">Reporte Consulado</strong> · Community Law Group
     <br>
-    © {datetime.now().year} · Data &amp; Efficiency Team
+    © 2026 · Data &amp; Efficiency Team
 </div>
 """, unsafe_allow_html=True)
