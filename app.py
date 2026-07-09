@@ -27,12 +27,8 @@ TELEFONO = "+1 (615) 913-5576"
 EMAIL_CONTACTO = "executiveassistant2@communitylawgroup.com"
 SITIO_WEB = "www.communitylawgroup.com"
 
-DEFAULT_TO = ["consnashville@minex.gob.gt"]
-DEFAULT_CC = ["lsillescas@minex.gob.gt", "dataprojects@communitylawgroup.com", 
-              "executiveassistant2@communitylawgroup.com", "data.analyst7@communitylawgroup.com"]
-
-LOGO_WIDTH = 180
 TAMANO_LOGO = 190
+LOGO_WIDTH = 180
 
 MESES = {
     1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
@@ -41,7 +37,7 @@ MESES = {
 }
 
 # ============================================================
-# FUNCIONES PARA OBTENER Y REDIMENSIONAR LOGO
+# FUNCIONES PARA OBTENER RECURSOS
 # ============================================================
 
 def get_image_from_github(url):
@@ -66,10 +62,8 @@ def resize_logo(logo_bytes, target_width=LOGO_WIDTH):
         output = BytesIO()
         img_resized.save(output, format='PNG', quality=95, optimize=True)
         output.seek(0)
-        print(f"   🖼️ Logo redimensionado: {target_width}x{target_height}px")
         return output.getvalue()
     except Exception as e:
-        print(f"   ⚠️ Error al redimensionar logo: {e}")
         return logo_bytes
 
 def get_logo_bytes():
@@ -86,7 +80,7 @@ def get_banner_base64():
     return None
 
 # ============================================================
-# FUNCIÓN PARA OBTENER SALUDO
+# FUNCIONES DE UTILIDAD (copiadas del código original)
 # ============================================================
 
 def obtener_saludo():
@@ -98,11 +92,8 @@ def obtener_saludo():
     else:
         return "Buenas noches"
 
-# ============================================================
-# FUNCIONES DE UTILIDAD
-# ============================================================
-
 def parsear_fechas(df):
+    """Detecta la columna de fechas y las parsea en formato MM/DD/YYYY"""
     columna_fecha = None
     for col in df.columns:
         if 'date' in str(col).lower():
@@ -376,6 +367,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
                      to_emails, cc_emails, test_mode=False):
     
     try:
+        # Leer y parsear fechas (formato MM/DD/YYYY)
         df = pd.read_excel(uploaded_file)
         df, columna_fecha = parsear_fechas(df)
         
@@ -399,7 +391,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
             datos = {'dia': dia, 'mes': mes, 'año': año, 'cantidad': cantidad}
             asunto = f"Reporte de atenciones - {dia} de {MESES[mes]} de {año}"
             
-        else:
+        else:  # Rango
             dia_ini = fecha_params['dia_ini']
             mes_ini = fecha_params['mes_ini']
             año_ini = fecha_params['año_ini']
@@ -680,26 +672,6 @@ st.markdown("""
         color: #4a5a6a !important;
     }
     
-    .metric-red .metric-value { color: #c0392b !important; }
-    .metric-red .metric-label { color: #922b21 !important; }
-    .metric-red { border-color: #c0392b !important; }
-    
-    .metric-yellow .metric-value { color: #d4ac0d !important; }
-    .metric-yellow .metric-label { color: #9a7d0a !important; }
-    .metric-yellow { border-color: #d4ac0d !important; }
-    
-    .metric-green .metric-value { color: #1e8449 !important; }
-    .metric-green .metric-label { color: #145a32 !important; }
-    .metric-green { border-color: #1e8449 !important; }
-    
-    .metric-blue .metric-value { color: #1a4a7a !important; }
-    .metric-blue .metric-label { color: #0d2a4a !important; }
-    .metric-blue { border-color: #1a4a7a !important; }
-    
-    .metric-purple .metric-value { color: #6c3483 !important; }
-    .metric-purple .metric-label { color: #6c3483 !important; }
-    .metric-purple { border-color: #6c3483 !important; }
-    
     .streamlit-expanderHeader {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -939,8 +911,12 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    to_input = st.text_area("Para (TO)", value=", ".join(DEFAULT_TO), label_visibility="collapsed", height=60)
-    cc_input = st.text_area("CC", value=", ".join(DEFAULT_CC), label_visibility="collapsed", height=60)
+    # Destinatarios por defecto (como en el código original)
+    default_to = "consnashville@minex.gob.gt"
+    default_cc = "lsillescas@minex.gob.gt, dataprojects@communitylawgroup.com, executiveassistant2@communitylawgroup.com, data.analyst7@communitylawgroup.com"
+    
+    to_input = st.text_area("Para (TO)", value=default_to, label_visibility="collapsed", height=60)
+    cc_input = st.text_area("CC", value=default_cc, label_visibility="collapsed", height=60)
     
     st.markdown("""
     <div class="sidebar-section">
@@ -966,12 +942,14 @@ with st.sidebar:
     st.caption("🔒 TLS seguro · Sin almacenamiento")
 
 # ============================================================
-# ÁREA PRINCIPAL - CORREGIDA
+# ÁREA PRINCIPAL - CON LA MISMA LÓGICA DEL CÓDIGO ORIGINAL
 # ============================================================
 
 if uploaded_file is not None:
+    # Cargar datos
     df = pd.read_excel(uploaded_file)
     
+    # Mostrar resumen
     st.markdown(f"<div class='text-large text-dark' style='font-weight: 700; font-size: 20px; margin-bottom: 16px;'>📊 Resumen de datos</div>", unsafe_allow_html=True)
     
     col_m1, col_m2, col_m3, col_m4 = st.columns(4)
@@ -985,6 +963,7 @@ if uploaded_file is not None:
         """, unsafe_allow_html=True)
     
     with col_m2:
+        # Detectar columna de fecha
         fecha_col = None
         for col in df.columns:
             if 'date' in str(col).lower():
@@ -992,6 +971,7 @@ if uploaded_file is not None:
                 break
         if fecha_col is None:
             fecha_col = df.columns[0]
+        
         fechas_unicas = df[fecha_col].nunique()
         st.markdown(f"""
         <div class="metric-container metric-purple animate animate-delay-2">
@@ -1020,23 +1000,30 @@ if uploaded_file is not None:
         st.dataframe(df.head(10), use_container_width=True)
     
     # ============================================================
-    # SELECCIÓN DE PERÍODO - CORREGIDA
+    # SELECCIÓN DE PERÍODO - IGUAL QUE EL CÓDIGO ORIGINAL
     # ============================================================
     st.subheader("📅 Seleccionar período")
+    
+    st.markdown("""
+    <div style="background-color: #f0f4f8; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #1a4a7a;">
+        <span style="font-size: 13px; color: #4a5a6a;">📌 Las fechas en el Excel están en formato <strong>MM/DD/YYYY</strong> (ejemplo: 01/05/2026 = 5 de enero)</span>
+    </div>
+    """, unsafe_allow_html=True)
     
     tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
     
     # ============================================================
-    # INICIALIZAR fecha_params CORRECTAMENTE
+    # INICIALIZAR fecha_params VACÍO
     # ============================================================
     fecha_params = {}
     
     if tipo_reporte == "Día específico":
+        st.markdown("**📅 Fecha específica:**")
         col_dia1, col_dia2, col_dia3 = st.columns(3)
         with col_dia1:
             dia = st.number_input("Día", min_value=1, max_value=31, value=1)
         with col_dia2:
-            mes = st.number_input("Mes", min_value=1, max_value=12, value=1)
+            mes = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1)
         with col_dia3:
             año = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year)
         
@@ -1047,23 +1034,23 @@ if uploaded_file is not None:
         }
         
     else:  # Rango de fechas
-        st.markdown("**Fecha de inicio:**")
+        st.markdown("**📅 Fecha de INICIO:**")
         col_ini1, col_ini2, col_ini3 = st.columns(3)
         with col_ini1:
-            dia_ini = st.number_input("Día inicio", min_value=1, max_value=31, value=1)
+            dia_ini = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_ini")
         with col_ini2:
-            mes_ini = st.number_input("Mes inicio", min_value=1, max_value=12, value=1)
+            mes_ini = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1, key="mes_ini")
         with col_ini3:
-            año_ini = st.number_input("Año inicio", min_value=2000, max_value=2100, value=datetime.now().year)
+            año_ini = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year, key="año_ini")
         
-        st.markdown("**Fecha de fin:**")
+        st.markdown("**📅 Fecha de FIN:**")
         col_fin1, col_fin2, col_fin3 = st.columns(3)
         with col_fin1:
-            dia_fin = st.number_input("Día fin", min_value=1, max_value=31, value=1)
+            dia_fin = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_fin")
         with col_fin2:
-            mes_fin = st.number_input("Mes fin", min_value=1, max_value=12, value=1)
+            mes_fin = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1, key="mes_fin")
         with col_fin3:
-            año_fin = st.number_input("Año fin", min_value=2000, max_value=2100, value=datetime.now().year)
+            año_fin = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year, key="año_fin")
         
         fecha_params = {
             'dia_ini': dia_ini,
