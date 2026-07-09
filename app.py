@@ -1,6 +1,3 @@
-# consulate_report_app.py
-# Reporte de Atenciones - Consulado (con textos claros en sidebar)
-
 import streamlit as st
 import pandas as pd
 import smtplib
