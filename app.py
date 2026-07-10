@@ -10,7 +10,7 @@ from datetime import datetime
 import requests
 from io import BytesIO
 from PIL import Image
-import pytz  # Para manejo de zona horaria
+import pytz
 
 # ============================================================
 # CONFIGURACIÓN
@@ -30,9 +30,8 @@ SITIO_WEB = "www.communitylawgroup.com"
 
 TAMANO_LOGO = 190
 LOGO_WIDTH = 180
-AÑO_FIJO = 2026  # Año fijo para todos los reportes
+AÑO_FIJO = 2026
 
-# Zona horaria de Nashville/Colombia (UTC-5)
 ZONA_HORARIA = pytz.timezone('America/Bogota')
 
 MESES = {
@@ -89,7 +88,6 @@ def get_banner_base64():
 # ============================================================
 
 def obtener_saludo():
-    """Obtiene el saludo basado en la hora local de Nashville/Colombia"""
     hora_actual = datetime.now(ZONA_HORARIA).hour
     if 6 <= hora_actual < 12:
         return "Buenos días"
@@ -99,7 +97,6 @@ def obtener_saludo():
         return "Buenas noches"
 
 def obtener_hora_local():
-    """Devuelve la hora actual en la zona horaria local"""
     return datetime.now(ZONA_HORARIA)
 
 # ============================================================
@@ -447,7 +444,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# CONFIGURACIÓN DE PÁGINA - FORZAR MODO CLARO
+# CONFIGURACIÓN DE PÁGINA
 # ============================================================
 
 st.set_page_config(
@@ -458,28 +455,40 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - FORZAR MODO CLARO EN TODA LA PLATAFORMA
+# CSS - MODO CLARO FORZADO (A COMO DE LUGAR)
 # ============================================================
 
 st.markdown("""
 <style>
     /* ============================================================
-       FORZAR MODO CLARO EN TODA LA PLATAFORMA
+       FORZAR MODO CLARO EN TODOS LOS ELEMENTOS
        ============================================================ */
     
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
-    /* Fondo general */
-    .stApp, .stApp > div, .main, .main > div, .block-container {
+    /* Fondo de toda la aplicación */
+    .stApp {
+        background-color: #e8edf2 !important;
+    }
+    
+    .stApp > div {
+        background-color: #e8edf2 !important;
+    }
+    
+    .main > div {
+        background-color: #e8edf2 !important;
+    }
+    
+    .block-container {
         background-color: #e8edf2 !important;
     }
     
     /* ============================================================
-       BARRA LATERAL - AZUL CLARO
+       BARRA LATERAL - CLARA
        ============================================================ */
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f0f4f8, #d5dde6) !important;
+        background: #f0f4f8 !important;
         border-right: 2px solid #1a4a7a !important;
     }
     
@@ -488,9 +497,12 @@ st.markdown("""
     }
     
     /* ============================================================
-       TEXTOS EN LA BARRA LATERAL - OSCUROS
+       TODOS LOS TEXTOS DE LA BARRA LATERAL - OSCUROS
        ============================================================ */
-    section[data-testid="stSidebar"] *,
+    section[data-testid="stSidebar"] * {
+        color: #1a2a3a !important;
+    }
+    
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] .stText,
     section[data-testid="stSidebar"] .stCaption,
@@ -505,7 +517,7 @@ st.markdown("""
     }
     
     /* ============================================================
-       INPUTS EN BARRA LATERAL
+       INPUTS EN BARRA LATERAL - BLANCOS
        ============================================================ */
     section[data-testid="stSidebar"] .stTextInput > div > div > input {
         background-color: #ffffff !important;
@@ -670,7 +682,7 @@ st.markdown("""
     .animate-delay-4 { animation-delay: 0.4s; }
     
     /* ============================================================
-       MÉTRICAS
+       MÉTRICAS - FONDO BLANCO
        ============================================================ */
     .metric-container {
         background-color: #ffffff !important;
@@ -729,7 +741,7 @@ st.markdown("""
     .metric-purple { border-color: #6c3483 !important; }
     
     /* ============================================================
-       EXPANDER
+       EXPANDER - FONDO BLANCO
        ============================================================ */
     .streamlit-expanderHeader {
         background-color: #ffffff !important;
@@ -748,7 +760,7 @@ st.markdown("""
     }
     
     /* ============================================================
-       DATA FRAME
+       DATA FRAME - FONDO BLANCO
        ============================================================ */
     .stDataFrame, .stDataFrame > div, .stDataFrame table {
         background-color: #ffffff !important;
@@ -807,7 +819,7 @@ st.markdown("""
     }
     
     /* ============================================================
-       BOTONES
+       BOTONES - GRADIENTE AZUL-MORADO
        ============================================================ */
     .stButton > button {
         border-radius: 10px !important;
@@ -826,7 +838,7 @@ st.markdown("""
     }
     
     /* ============================================================
-       RADIO BUTTONS
+       RADIO BUTTONS - FONDO BLANCO
        ============================================================ */
     .stRadio > div {
         background-color: #ffffff !important;
@@ -841,7 +853,7 @@ st.markdown("""
     }
     
     /* ============================================================
-       NUMBER INPUT
+       NUMBER INPUT - FONDO BLANCO
        ============================================================ */
     .stNumberInput > div > div > input {
         background-color: #ffffff !important;
@@ -1059,7 +1071,7 @@ if uploaded_file is not None:
     with col_m3:
         st.markdown(f"""
         <div class="metric-container metric-yellow animate animate-delay-3">
-            <div class="metric-value">{datetime.now(ZONA_HORARIA).strftime('%d/%m')}</div>
+            <div class="metric-value">{obtener_hora_local().strftime('%d/%m')}</div>
             <div class="metric-label">Hoy</div>
         </div>
         """, unsafe_allow_html=True)
@@ -1087,7 +1099,7 @@ if uploaded_file is not None:
             <br>
             📅 <strong>Año fijo: {AÑO_FIJO}</strong>
             <br>
-            🕐 <strong>Saludo actual:</strong> {obtener_saludo()} ({datetime.now(ZONA_HORARIA).strftime('%H:%M')} hora local)
+            🕐 <strong>Saludo actual:</strong> {obtener_saludo()} ({obtener_hora_local().strftime('%H:%M')} hora local)
         </span>
     </div>
     """, unsafe_allow_html=True)
