@@ -11,6 +11,7 @@ import requests
 from io import BytesIO
 from PIL import Image
 import pytz
+import traceback
 
 # ============================================================
 # CONFIGURACIÓN DE PÁGINA
@@ -110,6 +111,7 @@ def obtener_hora_local():
     return datetime.now(ZONA_HORARIA)
 
 def parsear_fechas(df):
+    """Detecta y parsea la columna de fechas"""
     columna_fecha = None
     for col in df.columns:
         if 'date' in str(col).lower():
@@ -118,6 +120,7 @@ def parsear_fechas(df):
     if columna_fecha is None:
         columna_fecha = df.columns[0]
     
+    # Intentar parsear fechas en formato MM/DD/YYYY
     df[columna_fecha] = pd.to_datetime(df[columna_fecha], format='%m/%d/%Y', errors='coerce')
     df = df.dropna(subset=[columna_fecha])
     df['Date_only'] = df[columna_fecha].dt.date
@@ -375,7 +378,7 @@ def enviar_correo(smtp_username, smtp_password, to_emails, cc_emails,
         return False, f"❌ Error al enviar: {str(e)}"
 
 # ============================================================
-# FUNCIÓN PRINCIPAL DE PROCESAMIENTO
+# FUNCIÓN PRINCIPAL DE PROCESAMIENTO - CON MANEJO DE ERRORES
 # ============================================================
 
 def procesar_reporte(uploaded_file, tipo_reporte, fecha_params, 
@@ -383,15 +386,36 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
                      to_emails, cc_emails, test_mode=False):
     
     try:
-        df = pd.read_excel(uploaded_file)
-        df, columna_fecha = parsear_fechas(df)
+        # ============================================================
+        # LECTURA SEGURA DEL EXCEL
+        # ============================================================
+        try:
+            df = pd.read_excel(uploaded_file, engine='openpyxl')
+        except Exception as e:
+            return False, f"❌ Error al leer el archivo Excel: {str(e)}"
         
         if len(df) == 0:
-            return False, "❌ No se encontraron fechas válidas en el archivo"
+            return False, "❌ El archivo está vacío"
         
+        # ============================================================
+        # PROCESAR FECHAS
+        # ============================================================
+        try:
+            df, columna_fecha = parsear_fechas(df)
+            if len(df) == 0:
+                return False, "❌ No se encontraron fechas válidas en el archivo"
+        except Exception as e:
+            return False, f"❌ Error al procesar fechas: {str(e)}"
+        
+        # ============================================================
+        # OBTENER LOGO
+        # ============================================================
         logo_bytes = get_logo_bytes()
         logo_cid = "company_logo_cid" if logo_bytes else None
         
+        # ============================================================
+        # PROCESAR SEGÚN TIPO
+        # ============================================================
         if tipo_reporte == 'dia':
             dia = fecha_params['dia']
             mes = fecha_params['mes']
@@ -430,13 +454,22 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
             else:
                 asunto = f"Reporte de atenciones - {dia_ini} de {MESES[mes_ini]} al {dia_fin} de {MESES[mes_fin]} de {AÑO_FIJO}"
         
+        # ============================================================
+        # GENERAR HTML
+        # ============================================================
         html_body = generar_html_reporte(datos, tipo_reporte, logo_cid)
         
+        # ============================================================
+        # MODO PRUEBA
+        # ============================================================
         if test_mode:
             to_emails = [smtp_username]
             cc_emails = []
             asunto = f"[PRUEBA] {asunto}"
         
+        # ============================================================
+        # ENVIAR CORREO
+        # ============================================================
         success, msg = enviar_correo(
             smtp_username, smtp_password,
             to_emails, cc_emails,
@@ -505,7 +538,15 @@ with st.sidebar:
 # Área principal
 if uploaded_file is not None:
     try:
-        df = pd.read_excel(uploaded_file)
+        # ============================================================
+        # LECTURA DEL EXCEL CON MANEJO DE ERRORES DETALLADO
+        # ============================================================
+        try:
+            df = pd.read_excel(uploaded_file, engine='openpyxl')
+        except Exception as e:
+            st.error(f"❌ Error al leer el archivo: {str(e)}")
+            st.info("💡 Asegúrate de que el archivo sea un Excel válido (.xlsx o .xls)")
+            st.stop()
         
         st.markdown("### 📊 Resumen de datos")
         col1, col2, col3, col4 = st.columns(4)
@@ -521,7 +562,7 @@ if uploaded_file is not None:
                     break
             if fecha_col is None:
                 fecha_col = df.columns[0]
-            st.metric("Fechas", df[fecha_col].nunique())
+            st.metric("Columnas", len(df.columns))
         
         with col3:
             st.metric("Hoy", obtener_hora_local().strftime('%d/%m/%Y'))
@@ -532,7 +573,9 @@ if uploaded_file is not None:
         with st.expander("👁️ Vista previa de datos"):
             st.dataframe(df.head(10), use_container_width=True)
         
-        # Selección de período
+        # ============================================================
+        # SELECCIÓN DE PERÍODO
+        # ============================================================
         st.markdown("### 📅 Seleccionar período")
         
         st.info(f"📌 Las fechas en el Excel están en formato **MM/DD/YYYY** (ejemplo: 01/05/2026 = 5 de enero) | 📅 **Año fijo: {AÑO_FIJO}** | 🕐 **Saludo actual:** {obtener_saludo()} ({obtener_hora_local().strftime('%H:%M')})")
@@ -572,6 +615,9 @@ if uploaded_file is not None:
                 'mes_fin': mes_fin
             }
         
+        # ============================================================
+        # PROCESAR ENVÍO
+        # ============================================================
         if enviar_reales or simular:
             if enviar_reales and (not smtp_username or not smtp_password):
                 st.error("⚠️ Ingresa tus credenciales de Outlook para enviar correos reales")
@@ -605,8 +651,8 @@ if uploaded_file is not None:
                         st.error(msg)
                         
     except Exception as e:
-        st.error(f"❌ Error al procesar el archivo: {str(e)}")
-        st.info("💡 Asegúrate de que el archivo tenga el formato correcto (MM/DD/YYYY)")
+        st.error(f"❌ Error inesperado: {str(e)}")
+        st.code(traceback.format_exc())
 
 else:
     st.info("📌 Carga un archivo Excel en la barra lateral para comenzar")
