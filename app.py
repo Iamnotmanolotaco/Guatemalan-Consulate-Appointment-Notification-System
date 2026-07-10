@@ -517,7 +517,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 📨 Destinatarios")
     default_to = "consnashville@minex.gob.gt"
-    default_cc = "lsillescas@minex.gob.gt, dataprojects@communitylawgroup.com, executiveassistant2@communitylawgroup.com, data.analyst7@communitylawgroup.com"
+    default_cc = "lsillescas@minex.gob.gt, executiveassistant2@communitylawgroup.com, diana.lopez@communitylawgroup.com"
     
     to_input = st.text_area("Para (TO)", value=default_to, height=60)
     cc_input = st.text_area("CC", value=default_cc, height=60)
