@@ -13,6 +13,17 @@ from PIL import Image
 import pytz
 
 # ============================================================
+# CONFIGURACIÓN DE PÁGINA - FORZAR TEMA CLARO
+# ============================================================
+
+st.set_page_config(
+    page_title="Reporte Consulado",
+    page_icon="📋",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# ============================================================
 # CONFIGURACIÓN
 # ============================================================
 
@@ -440,49 +451,46 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# CONFIGURACIÓN DE PÁGINA
-# ============================================================
-
-st.set_page_config(
-    page_title="Reporte Consulado",
-    page_icon="📋",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# ============================================================
-# CSS - BARRA LATERAL CLARA FORZADA
+# FORZAR TEMA CLARO CON CSS
 # ============================================================
 
 st.markdown("""
 <style>
     /* ============================================================
-       OCULTAR ELEMENTOS
+       FORZAR TEMA CLARO EN TODA LA APLICACIÓN
        ============================================================ */
+    
+    /* Ocultar elementos de Streamlit */
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
-    /* ============================================================
-       FONDO GENERAL - CLARO
-       ============================================================ */
-    .stApp, .stApp > div, .main, .main > div, .block-container {
+    /* Fondo general - CLARO */
+    .stApp {
+        background-color: #e8edf2 !important;
+    }
+    
+    .stApp > div {
+        background-color: #e8edf2 !important;
+    }
+    
+    .main > div {
+        background-color: #e8edf2 !important;
+    }
+    
+    .block-container {
         background-color: #e8edf2 !important;
     }
     
     /* ============================================================
-       BARRA LATERAL - CLARA FORZADA
+       BARRA LATERAL - CLARA
        ============================================================ */
-    
-    /* Contenedor principal de la barra lateral */
     section[data-testid="stSidebar"] {
         background-color: #f0f4f8 !important;
-        background-image: none !important;
         border-right: 2px solid #1a4a7a !important;
     }
     
     section[data-testid="stSidebar"] > div {
-        background-color: #f0f4f8 !important;
-        background-image: none !important;
+        background-color: transparent !important;
     }
     
     /* ============================================================
@@ -501,17 +509,8 @@ st.markdown("""
     section[data-testid="stSidebar"] span,
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] h4,
-    section[data-testid="stSidebar"] h5,
-    section[data-testid="stSidebar"] h6 {
+    section[data-testid="stSidebar"] h3 {
         color: #1a2a3a !important;
-    }
-    
-    /* Placeholder de inputs */
-    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
-        color: #8a9bb0 !important;
-        opacity: 0.7 !important;
     }
     
     /* ============================================================
@@ -525,6 +524,11 @@ st.markdown("""
         padding: 10px 14px !important;
         font-size: 14px !important;
         font-weight: 500 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
+        color: #8a9bb0 !important;
+        opacity: 0.7 !important;
     }
     
     section[data-testid="stSidebar"] .stTextInput > div > div > input:focus {
@@ -617,136 +621,15 @@ st.markdown("""
     }
     
     /* ============================================================
-       TÍTULO DE LA BARRA LATERAL
-       ============================================================ */
-    .sidebar-title {
-        text-align: center;
-        padding: 16px 0 12px 0;
-        border-bottom: 2px solid #1a4a7a;
-        margin-bottom: 16px;
-    }
-    
-    .sidebar-title .main {
-        font-weight: 800;
-        color: #1a3a5c;
-        font-size: 24px;
-        letter-spacing: -0.3px;
-    }
-    
-    .sidebar-title .sub {
-        font-size: 12px;
-        color: #4a5a6a;
-        letter-spacing: 1.5px;
-        font-weight: 600;
-    }
-    
-    /* ============================================================
-       SECCIONES DE LA BARRA LATERAL
-       ============================================================ */
-    .sidebar-section {
-        background: rgba(26, 74, 122, 0.05);
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin-bottom: 12px;
-        border: 1px solid rgba(26, 74, 122, 0.08);
-        transition: all 0.3s ease;
-    }
-    
-    .sidebar-section:hover {
-        background: rgba(26, 74, 122, 0.10);
-        border-color: #1a4a7a;
-        transform: translateX(4px);
-    }
-    
-    .sidebar-section .icon {
-        font-size: 18px;
-        margin-right: 8px;
-    }
-    
-    .sidebar-section .label {
-        font-weight: 700;
-        color: #1a2a3a !important;
-        font-size: 14px;
-    }
-    
-    .sidebar-section .desc {
-        font-size: 12px;
-        color: #4a5a6a !important;
-        margin-top: 2px;
-    }
-    
-    /* ============================================================
-       ANIMACIONES
-       ============================================================ */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animate { animation: fadeInUp 0.6s ease-out; }
-    .animate-delay-1 { animation-delay: 0.1s; }
-    .animate-delay-2 { animation-delay: 0.2s; }
-    .animate-delay-3 { animation-delay: 0.3s; }
-    .animate-delay-4 { animation-delay: 0.4s; }
-    
-    /* ============================================================
        MÉTRICAS - FONDO BLANCO
        ============================================================ */
-    .metric-container {
+    div[data-testid="stMetric"] {
         background-color: #ffffff !important;
-        border-radius: 12px;
-        padding: 18px 16px;
-        text-align: center;
-        border: 2px solid #e8edf2 !important;
-        transition: all 0.3s ease;
-        animation: fadeInUp 0.5s ease-out;
-        min-height: 100px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        border-radius: 12px !important;
+        padding: 16px !important;
+        border: 1px solid #e8edf2 !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
     }
-    
-    .metric-container:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
-    }
-    
-    .metric-value {
-        font-size: 38px;
-        font-weight: 800;
-        line-height: 1.2;
-        color: #1a4a7a !important;
-    }
-    
-    .metric-label {
-        font-size: 14px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-top: 4px;
-        color: #4a5a6a !important;
-    }
-    
-    .metric-red .metric-value { color: #c0392b !important; }
-    .metric-red .metric-label { color: #922b21 !important; }
-    .metric-red { border-color: #c0392b !important; }
-    
-    .metric-yellow .metric-value { color: #d4ac0d !important; }
-    .metric-yellow .metric-label { color: #9a7d0a !important; }
-    .metric-yellow { border-color: #d4ac0d !important; }
-    
-    .metric-green .metric-value { color: #1e8449 !important; }
-    .metric-green .metric-label { color: #145a32 !important; }
-    .metric-green { border-color: #1e8449 !important; }
-    
-    .metric-blue .metric-value { color: #1a4a7a !important; }
-    .metric-blue .metric-label { color: #0d2a4a !important; }
-    .metric-blue { border-color: #1a4a7a !important; }
-    
-    .metric-purple .metric-value { color: #6c3483 !important; }
-    .metric-purple .metric-label { color: #6c3483 !important; }
-    .metric-purple { border-color: #6c3483 !important; }
     
     /* ============================================================
        EXPANDER - FONDO BLANCO
@@ -754,10 +637,8 @@ st.markdown("""
     .streamlit-expanderHeader {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        border-radius: 8px !important;
         border: 1px solid #e8edf2 !important;
+        border-radius: 8px !important;
     }
     
     .streamlit-expanderContent {
@@ -770,11 +651,14 @@ st.markdown("""
     /* ============================================================
        DATA FRAME - FONDO BLANCO
        ============================================================ */
-    .stDataFrame, .stDataFrame > div, .stDataFrame table {
+    .stDataFrame {
         background-color: #ffffff !important;
         border-radius: 10px !important;
-        overflow: hidden !important;
         border: 1px solid #e8edf2 !important;
+    }
+    
+    .stDataFrame table {
+        background-color: #ffffff !important;
     }
     
     .stDataFrame th {
@@ -790,40 +674,14 @@ st.markdown("""
     /* ============================================================
        RESULTADOS
        ============================================================ */
-    .result-success {
-        background-color: #eafaf1 !important;
-        border-left: 6px solid #27ae60 !important;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
-        color: #1a2a3a !important;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
+    .stAlert {
+        background-color: #ffffff !important;
+        border: 1px solid #e8edf2 !important;
+        border-radius: 8px !important;
     }
     
-    .result-error {
-        background-color: #fdedec !important;
-        border-left: 6px solid #c0392b !important;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
+    .stAlert > div {
         color: #1a2a3a !important;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
-    }
-    
-    .result-info {
-        background-color: #eaf2fa !important;
-        border-left: 6px solid #1e40af !important;
-        padding: 14px 18px;
-        border-radius: 6px;
-        margin: 6px 0;
-        color: #1a2a3a !important;
-        font-size: 15px;
-        font-weight: 500;
-        animation: fadeInUp 0.4s ease-out;
     }
     
     /* ============================================================
@@ -871,19 +729,7 @@ st.markdown("""
     }
     
     /* ============================================================
-       FOOTER
-       ============================================================ */
-    .footer {
-        text-align: center;
-        padding: 20px;
-        color: #4a5a6a !important;
-        font-size: 13px;
-        border-top: 2px solid #e8edf2;
-        margin-top: 30px;
-    }
-    
-    /* ============================================================
-       TEXTOS GENERALES
+       TEXTOS GENERALES - OSCUROS
        ============================================================ */
     h1, h2, h3, h4, h5, h6 {
         color: #1a2a3a !important;
@@ -894,34 +740,12 @@ st.markdown("""
         color: #4a5a6a !important;
     }
     
-    .stAlert {
-        background-color: #ffffff !important;
-        border: 1px solid #e8edf2 !important;
-        border-radius: 8px !important;
-    }
-    
-    .stAlert > div {
-        color: #1a2a3a !important;
-    }
-    
+    /* ============================================================
+       SPINNER
+       ============================================================ */
     .stSpinner > div {
         border-color: #1a4a7a !important;
     }
-    
-    .banner-container {
-        border-radius: 14px;
-        overflow: hidden;
-        margin-bottom: 25px;
-        animation: fadeInUp 0.5s ease-out;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    }
-    
-    .text-large {
-        font-size: 18px;
-        line-height: 1.6;
-    }
-    
-    .text-dark { color: #0d1a2a !important; font-weight: 700; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -932,11 +756,7 @@ st.markdown("""
 banner_base64 = get_banner_base64()
 
 if banner_base64:
-    st.markdown(f"""
-    <div class="banner-container">
-        <img src="{banner_base64}" alt="Reporte Consulado" style="width: 100%; height: auto; display: block;">
-    </div>
-    """, unsafe_allow_html=True)
+    st.image(banner_base64, use_container_width=True)
 else:
     st.markdown("""
     <div style="
@@ -945,7 +765,6 @@ else:
         border-radius: 12px;
         margin-bottom: 25px;
         box-shadow: 0 4px 15px rgba(26, 58, 92, 0.25);
-        animation: fadeInUp 0.5s ease-out;
     ">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
             <div>
@@ -970,19 +789,19 @@ else:
 
 with st.sidebar:
     st.markdown("""
-    <div class="sidebar-title">
-        <div class="main">📋 Reporte</div>
-        <div class="sub">CONSULADO</div>
+    <div style="text-align: center; padding: 16px 0 12px 0; border-bottom: 2px solid #1a4a7a; margin-bottom: 16px;">
+        <div style="font-weight: 800; color: #1a3a5c; font-size: 24px; letter-spacing: -0.3px;">📋 Reporte</div>
+        <div style="font-size: 12px; color: #4a5a6a; letter-spacing: 1.5px; font-weight: 600;">CONSULADO</div>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown("""
-    <div class="sidebar-section">
+    <div style="background: rgba(26, 74, 122, 0.05); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; border: 1px solid rgba(26, 74, 122, 0.08);">
         <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="icon">📧</span>
-            <span class="label">Correo</span>
+            <span style="font-size: 18px; margin-right: 8px;">📧</span>
+            <span style="font-weight: 700; color: #1a2a3a; font-size: 14px;">Correo</span>
         </div>
-        <div class="desc">Configuración SMTP de Outlook</div>
+        <div style="font-size: 12px; color: #4a5a6a; margin-top: 2px;">Configuración SMTP de Outlook</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -990,24 +809,24 @@ with st.sidebar:
     smtp_password = st.text_input("Contraseña", type="password", placeholder="••••••••", label_visibility="collapsed")
     
     st.markdown("""
-    <div class="sidebar-section">
+    <div style="background: rgba(26, 74, 122, 0.05); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; border: 1px solid rgba(26, 74, 122, 0.08);">
         <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="icon">📁</span>
-            <span class="label">Datos</span>
+            <span style="font-size: 18px; margin-right: 8px;">📁</span>
+            <span style="font-weight: 700; color: #1a2a3a; font-size: 14px;">Datos</span>
         </div>
-        <div class="desc">Carga tu archivo Excel</div>
+        <div style="font-size: 12px; color: #4a5a6a; margin-top: 2px;">Carga tu archivo Excel</div>
     </div>
     """, unsafe_allow_html=True)
     
     uploaded_file = st.file_uploader("Archivo Excel", type=['xlsx', 'xls'], label_visibility="collapsed")
     
     st.markdown("""
-    <div class="sidebar-section">
+    <div style="background: rgba(26, 74, 122, 0.05); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; border: 1px solid rgba(26, 74, 122, 0.08);">
         <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="icon">📨</span>
-            <span class="label">Destinatarios</span>
+            <span style="font-size: 18px; margin-right: 8px;">📨</span>
+            <span style="font-weight: 700; color: #1a2a3a; font-size: 14px;">Destinatarios</span>
         </div>
-        <div class="desc">Separados por comas</div>
+        <div style="font-size: 12px; color: #4a5a6a; margin-top: 2px;">Separados por comas</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -1018,12 +837,12 @@ with st.sidebar:
     cc_input = st.text_area("CC", value=default_cc, label_visibility="collapsed", height=60)
     
     st.markdown("""
-    <div class="sidebar-section">
+    <div style="background: rgba(26, 74, 122, 0.05); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; border: 1px solid rgba(26, 74, 122, 0.08);">
         <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="icon">🧪</span>
-            <span class="label">Modo prueba</span>
+            <span style="font-size: 18px; margin-right: 8px;">🧪</span>
+            <span style="font-weight: 700; color: #1a2a3a; font-size: 14px;">Modo prueba</span>
         </div>
-        <div class="desc">Envía solo a tu cuenta</div>
+        <div style="font-size: 12px; color: #4a5a6a; margin-top: 2px;">Envía solo a tu cuenta</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -1045,149 +864,138 @@ with st.sidebar:
 # ============================================================
 
 if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file)
-    
-    st.markdown(f"<div class='text-large text-dark' style='font-weight: 700; font-size: 20px; margin-bottom: 16px;'>📊 Resumen de datos</div>", unsafe_allow_html=True)
-    
-    col_m1, col_m2, col_m3, col_m4 = st.columns(4)
-    
-    with col_m1:
-        st.markdown(f"""
-        <div class="metric-container metric-blue animate animate-delay-1">
-            <div class="metric-value">{len(df)}</div>
-            <div class="metric-label">Registros</div>
+    try:
+        df = pd.read_excel(uploaded_file)
+        
+        st.markdown("""
+        <div style="font-weight: 700; font-size: 20px; margin-bottom: 16px; color: #0d1a2a;">
+            📊 Resumen de datos
         </div>
         """, unsafe_allow_html=True)
-    
-    with col_m2:
-        fecha_col = None
-        for col in df.columns:
-            if 'date' in str(col).lower():
-                fecha_col = col
-                break
-        if fecha_col is None:
-            fecha_col = df.columns[0]
         
-        fechas_unicas = df[fecha_col].nunique()
-        st.markdown(f"""
-        <div class="metric-container metric-purple animate animate-delay-2">
-            <div class="metric-value">{fechas_unicas}</div>
-            <div class="metric-label">Fechas</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col_m3:
-        st.markdown(f"""
-        <div class="metric-container metric-yellow animate animate-delay-3">
-            <div class="metric-value">{obtener_hora_local().strftime('%d/%m')}</div>
-            <div class="metric-label">Hoy</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col_m4:
-        st.markdown(f"""
-        <div class="metric-container metric-green animate animate-delay-4">
-            <div class="metric-value">{AÑO_FIJO}</div>
-            <div class="metric-label">Año</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with st.expander("👁️ Vista previa de datos"):
-        st.dataframe(df.head(10), use_container_width=True)
-    
-    # ============================================================
-    # SELECCIÓN DE PERÍODO
-    # ============================================================
-    st.subheader("📅 Seleccionar período")
-    
-    st.markdown(f"""
-    <div style="background-color: #f0f4f8; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #1a4a7a;">
-        <span style="font-size: 13px; color: #4a5a6a;">
-            📌 Las fechas en el Excel están en formato <strong>MM/DD/YYYY</strong> (ejemplo: 01/05/2026 = 5 de enero)
-            <br>
-            📅 <strong>Año fijo: {AÑO_FIJO}</strong>
-            <br>
-            🕐 <strong>Saludo actual:</strong> {obtener_saludo()} ({obtener_hora_local().strftime('%H:%M')} hora local)
-        </span>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
-    
-    # ============================================================
-    # INICIALIZAR fecha_params
-    # ============================================================
-    fecha_params = {}
-    
-    if tipo_reporte == "Día específico":
-        st.markdown("**📅 Fecha específica:**")
-        col_dia1, col_dia2 = st.columns(2)
-        with col_dia1:
-            dia = st.number_input("Día", min_value=1, max_value=31, value=1)
-        with col_dia2:
-            mes = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1)
+        col_m1, col_m2, col_m3, col_m4 = st.columns(4)
         
-        fecha_params = {
-            'dia': dia,
-            'mes': mes
-        }
+        with col_m1:
+            st.metric(label="Registros", value=len(df))
         
-    else:  # Rango de fechas
-        st.markdown("**📅 Fecha de INICIO:**")
-        col_ini1, col_ini2 = st.columns(2)
-        with col_ini1:
-            dia_ini = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_ini")
-        with col_ini2:
-            mes_ini = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1, key="mes_ini")
-        
-        st.markdown("**📅 Fecha de FIN:**")
-        col_fin1, col_fin2 = st.columns(2)
-        with col_fin1:
-            dia_fin = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_fin")
-        with col_fin2:
-            mes_fin = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1, key="mes_fin")
-        
-        fecha_params = {
-            'dia_ini': dia_ini,
-            'mes_ini': mes_ini,
-            'dia_fin': dia_fin,
-            'mes_fin': mes_fin
-        }
-    
-    # ============================================================
-    # PROCESAR ENVÍO
-    # ============================================================
-    if enviar_reales or simular:
-        if enviar_reales and (not smtp_username or not smtp_password):
-            st.error("⚠️ Ingresa tus credenciales de Outlook para enviar correos reales")
-        else:
-            to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
-            cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
+        with col_m2:
+            fecha_col = None
+            for col in df.columns:
+                if 'date' in str(col).lower():
+                    fecha_col = col
+                    break
+            if fecha_col is None:
+                fecha_col = df.columns[0]
             
-            if not to_emails:
-                st.error("❌ Debes especificar al menos un destinatario")
+            fechas_unicas = df[fecha_col].nunique()
+            st.metric(label="Fechas", value=fechas_unicas)
+        
+        with col_m3:
+            st.metric(label="Hoy", value=obtener_hora_local().strftime('%d/%m'))
+        
+        with col_m4:
+            st.metric(label="Año", value=AÑO_FIJO)
+        
+        with st.expander("👁️ Vista previa de datos"):
+            st.dataframe(df.head(10), use_container_width=True)
+        
+        # ============================================================
+        # SELECCIÓN DE PERÍODO
+        # ============================================================
+        st.subheader("📅 Seleccionar período")
+        
+        st.markdown(f"""
+        <div style="background-color: #f0f4f8; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #1a4a7a;">
+            <span style="font-size: 13px; color: #4a5a6a;">
+                📌 Las fechas en el Excel están en formato <strong>MM/DD/YYYY</strong> (ejemplo: 01/05/2026 = 5 de enero)
+                <br>
+                📅 <strong>Año fijo: {AÑO_FIJO}</strong>
+                <br>
+                🕐 <strong>Saludo actual:</strong> {obtener_saludo()} ({obtener_hora_local().strftime('%H:%M')} hora local)
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
+        
+        # ============================================================
+        # INICIALIZAR fecha_params
+        # ============================================================
+        fecha_params = {}
+        
+        if tipo_reporte == "Día específico":
+            st.markdown("**📅 Fecha específica:**")
+            col_dia1, col_dia2 = st.columns(2)
+            with col_dia1:
+                dia = st.number_input("Día", min_value=1, max_value=31, value=1)
+            with col_dia2:
+                mes = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1)
+            
+            fecha_params = {
+                'dia': dia,
+                'mes': mes
+            }
+            
+        else:  # Rango de fechas
+            st.markdown("**📅 Fecha de INICIO:**")
+            col_ini1, col_ini2 = st.columns(2)
+            with col_ini1:
+                dia_ini = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_ini")
+            with col_ini2:
+                mes_ini = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1, key="mes_ini")
+            
+            st.markdown("**📅 Fecha de FIN:**")
+            col_fin1, col_fin2 = st.columns(2)
+            with col_fin1:
+                dia_fin = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_fin")
+            with col_fin2:
+                mes_fin = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1, key="mes_fin")
+            
+            fecha_params = {
+                'dia_ini': dia_ini,
+                'mes_ini': mes_ini,
+                'dia_fin': dia_fin,
+                'mes_fin': mes_fin
+            }
+        
+        # ============================================================
+        # PROCESAR ENVÍO
+        # ============================================================
+        if enviar_reales or simular:
+            if enviar_reales and (not smtp_username or not smtp_password):
+                st.error("⚠️ Ingresa tus credenciales de Outlook para enviar correos reales")
             else:
-                with st.spinner("⏳ Procesando reporte..."):
-                    tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
-                    
-                    success, msg = procesar_reporte(
-                        uploaded_file, tipo, fecha_params,
-                        smtp_username, smtp_password,
-                        to_emails, cc_emails,
-                        test_mode
-                    )
+                to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
+                cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
                 
-                st.markdown("---")
-                st.markdown(f"<div style='font-weight: 700; color: #1a2a3a; font-size: 20px;'>📋 Resultados</div>", unsafe_allow_html=True)
-                
-                if success:
-                    st.success(msg)
-                    if test_mode:
-                        st.info("🔬 Modo prueba activo: El correo se envió solo a tu cuenta")
-                    else:
-                        st.balloons()
+                if not to_emails:
+                    st.error("❌ Debes especificar al menos un destinatario")
                 else:
-                    st.error(msg)
+                    with st.spinner("⏳ Procesando reporte..."):
+                        tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
+                        
+                        success, msg = procesar_reporte(
+                            uploaded_file, tipo, fecha_params,
+                            smtp_username, smtp_password,
+                            to_emails, cc_emails,
+                            test_mode
+                        )
+                    
+                    st.markdown("---")
+                    st.markdown("<div style='font-weight: 700; color: #1a2a3a; font-size: 20px;'>📋 Resultados</div>", unsafe_allow_html=True)
+                    
+                    if success:
+                        st.success(msg)
+                        if test_mode:
+                            st.info("🔬 Modo prueba activo: El correo se envió solo a tu cuenta")
+                        else:
+                            st.balloons()
+                    else:
+                        st.error(msg)
+                        
+    except Exception as e:
+        st.error(f"❌ Error al procesar el archivo: {str(e)}")
+        st.info("💡 Asegúrate de que el archivo tenga el formato correcto (MM/DD/YYYY)")
 
 else:
     st.markdown("""
@@ -1197,7 +1005,6 @@ else:
         background-color: #ffffff;
         border-radius: 14px;
         border: 2px dashed #d5dde6;
-        animation: fadeInUp 0.6s ease-out;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     ">
         <div style="font-size: 72px; margin-bottom: 24px;">📂</div>
@@ -1218,7 +1025,7 @@ else:
 # ============================================================
 
 st.markdown("""
-<div class="footer">
+<div style="text-align: center; padding: 20px; color: #4a5a6a; font-size: 13px; border-top: 2px solid #e8edf2; margin-top: 30px;">
     <strong style="color: #1a2a3a;">Reporte Consulado</strong> · Community Law Group
     <br>
     © 2026 · Data &amp; Efficiency Team
