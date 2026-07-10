@@ -29,6 +29,7 @@ SITIO_WEB = "www.communitylawgroup.com"
 
 TAMANO_LOGO = 190
 LOGO_WIDTH = 180
+AÑO_FIJO = 2026  # Año fijo para todos los reportes
 
 MESES = {
     1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
@@ -80,7 +81,7 @@ def get_banner_base64():
     return None
 
 # ============================================================
-# FUNCIONES DE UTILIDAD (copiadas del código original)
+# FUNCIONES DE UTILIDAD
 # ============================================================
 
 def obtener_saludo():
@@ -93,7 +94,6 @@ def obtener_saludo():
         return "Buenas noches"
 
 def parsear_fechas(df):
-    """Detecta la columna de fechas y las parsea en formato MM/DD/YYYY"""
     columna_fecha = None
     for col in df.columns:
         if 'date' in str(col).lower():
@@ -367,7 +367,6 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
                      to_emails, cc_emails, test_mode=False):
     
     try:
-        # Leer y parsear fechas (formato MM/DD/YYYY)
         df = pd.read_excel(uploaded_file)
         df, columna_fecha = parsear_fechas(df)
         
@@ -380,7 +379,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         if tipo_reporte == 'dia':
             dia = fecha_params['dia']
             mes = fecha_params['mes']
-            año = fecha_params['año']
+            año = AÑO_FIJO
             fecha_buscar = datetime(año, mes, dia).date()
             
             cantidad = len(df[df['Date_only'] == fecha_buscar])
@@ -394,13 +393,11 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         else:  # Rango
             dia_ini = fecha_params['dia_ini']
             mes_ini = fecha_params['mes_ini']
-            año_ini = fecha_params['año_ini']
             dia_fin = fecha_params['dia_fin']
             mes_fin = fecha_params['mes_fin']
-            año_fin = fecha_params['año_fin']
             
-            fecha_inicio = datetime(año_ini, mes_ini, dia_ini).date()
-            fecha_fin = datetime(año_fin, mes_fin, dia_fin).date()
+            fecha_inicio = datetime(AÑO_FIJO, mes_ini, dia_ini).date()
+            fecha_fin = datetime(AÑO_FIJO, mes_fin, dia_fin).date()
             
             mask = (df['Date_only'] >= fecha_inicio) & (df['Date_only'] <= fecha_fin)
             df_filtrado = df[mask]
@@ -412,10 +409,10 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
             total = sum(conteo.values())
             datos = {'conteo': conteo, 'total': total, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}
             
-            if año_inicio == año_fin:
-                asunto = f"Reporte de atenciones - {dia_ini} de {MESES[mes_ini]} al {dia_fin} de {MESES[mes_fin]} de {año_inicio}"
+            if dia_ini == dia_fin and mes_ini == mes_fin:
+                asunto = f"Reporte de atenciones - {dia_ini} de {MESES[mes_ini]} de {AÑO_FIJO}"
             else:
-                asunto = f"Reporte de atenciones - {dia_ini} de {MESES[mes_ini]} de {año_ini} al {dia_fin} de {MESES[mes_fin]} de {año_fin}"
+                asunto = f"Reporte de atenciones - {dia_ini} de {MESES[mes_ini]} al {dia_fin} de {MESES[mes_fin]} de {AÑO_FIJO}"
         
         html_body = generar_html_reporte(datos, tipo_reporte, logo_cid)
         
@@ -911,7 +908,6 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    # Destinatarios por defecto (como en el código original)
     default_to = "consnashville@minex.gob.gt"
     default_cc = "lsillescas@minex.gob.gt, dataprojects@communitylawgroup.com, executiveassistant2@communitylawgroup.com, data.analyst7@communitylawgroup.com"
     
@@ -942,14 +938,12 @@ with st.sidebar:
     st.caption("🔒 TLS seguro · Sin almacenamiento")
 
 # ============================================================
-# ÁREA PRINCIPAL - CON LA MISMA LÓGICA DEL CÓDIGO ORIGINAL
+# ÁREA PRINCIPAL
 # ============================================================
 
 if uploaded_file is not None:
-    # Cargar datos
     df = pd.read_excel(uploaded_file)
     
-    # Mostrar resumen
     st.markdown(f"<div class='text-large text-dark' style='font-weight: 700; font-size: 20px; margin-bottom: 16px;'>📊 Resumen de datos</div>", unsafe_allow_html=True)
     
     col_m1, col_m2, col_m3, col_m4 = st.columns(4)
@@ -963,7 +957,6 @@ if uploaded_file is not None:
         """, unsafe_allow_html=True)
     
     with col_m2:
-        # Detectar columna de fecha
         fecha_col = None
         for col in df.columns:
             if 'date' in str(col).lower():
@@ -991,7 +984,7 @@ if uploaded_file is not None:
     with col_m4:
         st.markdown(f"""
         <div class="metric-container metric-green animate animate-delay-4">
-            <div class="metric-value">{datetime.now().year}</div>
+            <div class="metric-value">{AÑO_FIJO}</div>
             <div class="metric-label">Año</div>
         </div>
         """, unsafe_allow_html=True)
@@ -1000,65 +993,60 @@ if uploaded_file is not None:
         st.dataframe(df.head(10), use_container_width=True)
     
     # ============================================================
-    # SELECCIÓN DE PERÍODO - IGUAL QUE EL CÓDIGO ORIGINAL
+    # SELECCIÓN DE PERÍODO - SIMPLIFICADA (SOLO DÍA Y MES)
     # ============================================================
     st.subheader("📅 Seleccionar período")
     
-    st.markdown("""
+    st.markdown(f"""
     <div style="background-color: #f0f4f8; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #1a4a7a;">
-        <span style="font-size: 13px; color: #4a5a6a;">📌 Las fechas en el Excel están en formato <strong>MM/DD/YYYY</strong> (ejemplo: 01/05/2026 = 5 de enero)</span>
+        <span style="font-size: 13px; color: #4a5a6a;">
+            📌 Las fechas en el Excel están en formato <strong>MM/DD/YYYY</strong> (ejemplo: 01/05/2026 = 5 de enero)
+            <br>
+            📅 <strong>Año fijo: {AÑO_FIJO}</strong>
+        </span>
     </div>
     """, unsafe_allow_html=True)
     
     tipo_reporte = st.radio("Tipo de reporte:", ["Día específico", "Rango de fechas"], horizontal=True)
     
     # ============================================================
-    # INICIALIZAR fecha_params VACÍO
+    # INICIALIZAR fecha_params
     # ============================================================
     fecha_params = {}
     
     if tipo_reporte == "Día específico":
         st.markdown("**📅 Fecha específica:**")
-        col_dia1, col_dia2, col_dia3 = st.columns(3)
+        col_dia1, col_dia2 = st.columns(2)
         with col_dia1:
             dia = st.number_input("Día", min_value=1, max_value=31, value=1)
         with col_dia2:
             mes = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1)
-        with col_dia3:
-            año = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year)
         
         fecha_params = {
             'dia': dia,
-            'mes': mes,
-            'año': año
+            'mes': mes
         }
         
     else:  # Rango de fechas
         st.markdown("**📅 Fecha de INICIO:**")
-        col_ini1, col_ini2, col_ini3 = st.columns(3)
+        col_ini1, col_ini2 = st.columns(2)
         with col_ini1:
             dia_ini = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_ini")
         with col_ini2:
             mes_ini = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1, key="mes_ini")
-        with col_ini3:
-            año_ini = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year, key="año_ini")
         
         st.markdown("**📅 Fecha de FIN:**")
-        col_fin1, col_fin2, col_fin3 = st.columns(3)
+        col_fin1, col_fin2 = st.columns(2)
         with col_fin1:
             dia_fin = st.number_input("Día", min_value=1, max_value=31, value=1, key="dia_fin")
         with col_fin2:
             mes_fin = st.number_input("Mes (1-12)", min_value=1, max_value=12, value=1, key="mes_fin")
-        with col_fin3:
-            año_fin = st.number_input("Año", min_value=2000, max_value=2100, value=datetime.now().year, key="año_fin")
         
         fecha_params = {
             'dia_ini': dia_ini,
             'mes_ini': mes_ini,
-            'año_ini': año_ini,
             'dia_fin': dia_fin,
-            'mes_fin': mes_fin,
-            'año_fin': año_fin
+            'mes_fin': mes_fin
         }
     
     # ============================================================
@@ -1068,7 +1056,6 @@ if uploaded_file is not None:
         if enviar_reales and (not smtp_username or not smtp_password):
             st.error("⚠️ Ingresa tus credenciales de Outlook para enviar correos reales")
         else:
-            # Procesar destinatarios
             to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
             cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
             
