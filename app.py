@@ -10,6 +10,7 @@ from datetime import datetime
 import requests
 from io import BytesIO
 from PIL import Image
+import pytz  # Para manejo de zona horaria
 
 # ============================================================
 # CONFIGURACIÓN
@@ -30,6 +31,9 @@ SITIO_WEB = "www.communitylawgroup.com"
 TAMANO_LOGO = 190
 LOGO_WIDTH = 180
 AÑO_FIJO = 2026  # Año fijo para todos los reportes
+
+# Zona horaria de Nashville/Colombia (UTC-5)
+ZONA_HORARIA = pytz.timezone('America/Bogota')
 
 MESES = {
     1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
@@ -81,17 +85,26 @@ def get_banner_base64():
     return None
 
 # ============================================================
-# FUNCIONES DE UTILIDAD
+# FUNCIÓN PARA OBTENER SALUDO CON ZONA HORARIA CORRECTA
 # ============================================================
 
 def obtener_saludo():
-    hora_actual = datetime.now().hour
+    """Obtiene el saludo basado en la hora local de Nashville/Colombia"""
+    hora_actual = datetime.now(ZONA_HORARIA).hour
     if 6 <= hora_actual < 12:
         return "Buenos días"
     elif 12 <= hora_actual < 18:
         return "Buenas tardes"
     else:
         return "Buenas noches"
+
+def obtener_hora_local():
+    """Devuelve la hora actual en la zona horaria local"""
+    return datetime.now(ZONA_HORARIA)
+
+# ============================================================
+# FUNCIONES DE UTILIDAD
+# ============================================================
 
 def parsear_fechas(df):
     columna_fecha = None
@@ -434,7 +447,7 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# CONFIGURACIÓN DE PÁGINA
+# CONFIGURACIÓN DE PÁGINA - FORZAR MODO CLARO
 # ============================================================
 
 st.set_page_config(
@@ -445,18 +458,26 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - MODO CLARO FORZADO
+# CSS - FORZAR MODO CLARO EN TODA LA PLATAFORMA
 # ============================================================
 
 st.markdown("""
 <style>
+    /* ============================================================
+       FORZAR MODO CLARO EN TODA LA PLATAFORMA
+       ============================================================ */
+    
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
+    /* Fondo general */
     .stApp, .stApp > div, .main, .main > div, .block-container {
         background-color: #e8edf2 !important;
     }
     
+    /* ============================================================
+       BARRA LATERAL - AZUL CLARO
+       ============================================================ */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #f0f4f8, #d5dde6) !important;
         border-right: 2px solid #1a4a7a !important;
@@ -466,6 +487,9 @@ st.markdown("""
         background-color: transparent !important;
     }
     
+    /* ============================================================
+       TEXTOS EN LA BARRA LATERAL - OSCUROS
+       ============================================================ */
     section[data-testid="stSidebar"] *,
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] .stText,
@@ -480,6 +504,9 @@ st.markdown("""
         color: #1a2a3a !important;
     }
     
+    /* ============================================================
+       INPUTS EN BARRA LATERAL
+       ============================================================ */
     section[data-testid="stSidebar"] .stTextInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -569,6 +596,9 @@ st.markdown("""
         opacity: 0.5 !important;
     }
     
+    /* ============================================================
+       TÍTULO DE LA BARRA LATERAL
+       ============================================================ */
     .sidebar-title {
         text-align: center;
         padding: 16px 0 12px 0;
@@ -590,6 +620,9 @@ st.markdown("""
         font-weight: 600;
     }
     
+    /* ============================================================
+       SECCIONES DE LA BARRA LATERAL
+       ============================================================ */
     .sidebar-section {
         background: rgba(26, 74, 122, 0.05);
         border-radius: 10px;
@@ -622,6 +655,9 @@ st.markdown("""
         margin-top: 2px;
     }
     
+    /* ============================================================
+       ANIMACIONES
+       ============================================================ */
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
@@ -633,6 +669,9 @@ st.markdown("""
     .animate-delay-3 { animation-delay: 0.3s; }
     .animate-delay-4 { animation-delay: 0.4s; }
     
+    /* ============================================================
+       MÉTRICAS
+       ============================================================ */
     .metric-container {
         background-color: #ffffff !important;
         border-radius: 12px;
@@ -669,6 +708,29 @@ st.markdown("""
         color: #4a5a6a !important;
     }
     
+    .metric-red .metric-value { color: #c0392b !important; }
+    .metric-red .metric-label { color: #922b21 !important; }
+    .metric-red { border-color: #c0392b !important; }
+    
+    .metric-yellow .metric-value { color: #d4ac0d !important; }
+    .metric-yellow .metric-label { color: #9a7d0a !important; }
+    .metric-yellow { border-color: #d4ac0d !important; }
+    
+    .metric-green .metric-value { color: #1e8449 !important; }
+    .metric-green .metric-label { color: #145a32 !important; }
+    .metric-green { border-color: #1e8449 !important; }
+    
+    .metric-blue .metric-value { color: #1a4a7a !important; }
+    .metric-blue .metric-label { color: #0d2a4a !important; }
+    .metric-blue { border-color: #1a4a7a !important; }
+    
+    .metric-purple .metric-value { color: #6c3483 !important; }
+    .metric-purple .metric-label { color: #6c3483 !important; }
+    .metric-purple { border-color: #6c3483 !important; }
+    
+    /* ============================================================
+       EXPANDER
+       ============================================================ */
     .streamlit-expanderHeader {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -685,6 +747,9 @@ st.markdown("""
         border-radius: 0 0 8px 8px !important;
     }
     
+    /* ============================================================
+       DATA FRAME
+       ============================================================ */
     .stDataFrame, .stDataFrame > div, .stDataFrame table {
         background-color: #ffffff !important;
         border-radius: 10px !important;
@@ -702,6 +767,9 @@ st.markdown("""
         color: #1a2a3a !important;
     }
     
+    /* ============================================================
+       RESULTADOS
+       ============================================================ */
     .result-success {
         background-color: #eafaf1 !important;
         border-left: 6px solid #27ae60 !important;
@@ -738,6 +806,9 @@ st.markdown("""
         animation: fadeInUp 0.4s ease-out;
     }
     
+    /* ============================================================
+       BOTONES
+       ============================================================ */
     .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -754,6 +825,9 @@ st.markdown("""
         box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
     }
     
+    /* ============================================================
+       RADIO BUTTONS
+       ============================================================ */
     .stRadio > div {
         background-color: #ffffff !important;
         padding: 10px 16px !important;
@@ -766,6 +840,9 @@ st.markdown("""
         font-weight: 500 !important;
     }
     
+    /* ============================================================
+       NUMBER INPUT
+       ============================================================ */
     .stNumberInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -773,6 +850,9 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
+    /* ============================================================
+       FOOTER
+       ============================================================ */
     .footer {
         text-align: center;
         padding: 20px;
@@ -782,6 +862,9 @@ st.markdown("""
         margin-top: 30px;
     }
     
+    /* ============================================================
+       TEXTOS GENERALES
+       ============================================================ */
     h1, h2, h3, h4, h5, h6 {
         color: #1a2a3a !important;
         font-weight: 700 !important;
@@ -976,7 +1059,7 @@ if uploaded_file is not None:
     with col_m3:
         st.markdown(f"""
         <div class="metric-container metric-yellow animate animate-delay-3">
-            <div class="metric-value">{datetime.now().strftime('%d/%m')}</div>
+            <div class="metric-value">{datetime.now(ZONA_HORARIA).strftime('%d/%m')}</div>
             <div class="metric-label">Hoy</div>
         </div>
         """, unsafe_allow_html=True)
@@ -993,7 +1076,7 @@ if uploaded_file is not None:
         st.dataframe(df.head(10), use_container_width=True)
     
     # ============================================================
-    # SELECCIÓN DE PERÍODO - SIMPLIFICADA (SOLO DÍA Y MES)
+    # SELECCIÓN DE PERÍODO
     # ============================================================
     st.subheader("📅 Seleccionar período")
     
@@ -1003,6 +1086,8 @@ if uploaded_file is not None:
             📌 Las fechas en el Excel están en formato <strong>MM/DD/YYYY</strong> (ejemplo: 01/05/2026 = 5 de enero)
             <br>
             📅 <strong>Año fijo: {AÑO_FIJO}</strong>
+            <br>
+            🕐 <strong>Saludo actual:</strong> {obtener_saludo()} ({datetime.now(ZONA_HORARIA).strftime('%H:%M')} hora local)
         </span>
     </div>
     """, unsafe_allow_html=True)
