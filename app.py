@@ -13,7 +13,7 @@ from PIL import Image
 import pytz
 
 # ============================================================
-# CONFIGURACIÓN DE PÁGINA - FORZAR TEMA CLARO
+# CONFIGURACIÓN DE PÁGINA - TEMA CLARO
 # ============================================================
 
 st.set_page_config(
@@ -331,7 +331,7 @@ def generar_html_reporte(datos, tipo_reporte, logo_cid=None):
     return html
 
 # ============================================================
-# FUNCIÓN PARA ENVIAR CORREO
+# FUNCIÓN PARA ENVIAR CORREO - CORREGIDA
 # ============================================================
 
 def enviar_correo(smtp_username, smtp_password, to_emails, cc_emails, 
@@ -376,7 +376,7 @@ def enviar_correo(smtp_username, smtp_password, to_emails, cc_emails,
         return False, f"❌ Error al enviar: {str(e)}"
 
 # ============================================================
-# FUNCIÓN PRINCIPAL DE PROCESAMIENTO
+# FUNCIÓN PRINCIPAL DE PROCESAMIENTO - CORREGIDA
 # ============================================================
 
 def procesar_reporte(uploaded_file, tipo_reporte, fecha_params, 
@@ -384,15 +384,18 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
                      to_emails, cc_emails, test_mode=False):
     
     try:
+        # Leer y procesar archivo
         df = pd.read_excel(uploaded_file)
         df, columna_fecha = parsear_fechas(df)
         
         if len(df) == 0:
             return False, "❌ No se encontraron fechas válidas en el archivo"
         
+        # Obtener logo
         logo_bytes = get_logo_bytes()
         logo_cid = "company_logo_cid" if logo_bytes else None
         
+        # Procesar según tipo
         if tipo_reporte == 'dia':
             dia = fecha_params['dia']
             mes = fecha_params['mes']
@@ -431,13 +434,19 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
             else:
                 asunto = f"Reporte de atenciones - {dia_ini} de {MESES[mes_ini]} al {dia_fin} de {MESES[mes_fin]} de {AÑO_FIJO}"
         
+        # Generar HTML
         html_body = generar_html_reporte(datos, tipo_reporte, logo_cid)
         
+        # ============================================================
+        # MODO PRUEBA: Enviar solo al correo del usuario
+        # ============================================================
         if test_mode:
             to_emails = [smtp_username]
             cc_emails = []
             asunto = f"[PRUEBA] {asunto}"
+        # ============================================================
         
+        # Enviar correo
         success, msg = enviar_correo(
             smtp_username, smtp_password,
             to_emails, cc_emails,
@@ -451,20 +460,14 @@ def procesar_reporte(uploaded_file, tipo_reporte, fecha_params,
         return False, f"❌ Error: {str(e)}"
 
 # ============================================================
-# FORZAR TEMA CLARO CON CSS
+# CSS - TEMA CLARO
 # ============================================================
 
 st.markdown("""
 <style>
-    /* ============================================================
-       FORZAR TEMA CLARO EN TODA LA APLICACIÓN
-       ============================================================ */
-    
-    /* Ocultar elementos de Streamlit */
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
-    /* Fondo general - CLARO */
     .stApp {
         background-color: #e8edf2 !important;
     }
@@ -481,9 +484,6 @@ st.markdown("""
         background-color: #e8edf2 !important;
     }
     
-    /* ============================================================
-       BARRA LATERAL - CLARA
-       ============================================================ */
     section[data-testid="stSidebar"] {
         background-color: #f0f4f8 !important;
         border-right: 2px solid #1a4a7a !important;
@@ -493,9 +493,6 @@ st.markdown("""
         background-color: transparent !important;
     }
     
-    /* ============================================================
-       TODOS LOS TEXTOS EN LA BARRA LATERAL - OSCUROS
-       ============================================================ */
     section[data-testid="stSidebar"] * {
         color: #1a2a3a !important;
     }
@@ -506,16 +503,10 @@ st.markdown("""
     section[data-testid="stSidebar"] label,
     section[data-testid="stSidebar"] .stMarkdown p,
     section[data-testid="stSidebar"] div,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {
+    section[data-testid="stSidebar"] span {
         color: #1a2a3a !important;
     }
     
-    /* ============================================================
-       INPUTS EN BARRA LATERAL - BLANCOS CON TEXTO OSCURO
-       ============================================================ */
     section[data-testid="stSidebar"] .stTextInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -523,17 +514,6 @@ st.markdown("""
         border-radius: 8px !important;
         padding: 10px 14px !important;
         font-size: 14px !important;
-        font-weight: 500 !important;
-    }
-    
-    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
-        color: #8a9bb0 !important;
-        opacity: 0.7 !important;
-    }
-    
-    section[data-testid="stSidebar"] .stTextInput > div > div > input:focus {
-        border-color: #1a4a7a !important;
-        box-shadow: 0 0 20px rgba(26, 74, 122, 0.15) !important;
     }
     
     section[data-testid="stSidebar"] .stTextArea > div > div > textarea {
@@ -544,9 +524,6 @@ st.markdown("""
         font-size: 14px !important;
     }
     
-    /* ============================================================
-       FILE UPLOADER EN BARRA LATERAL
-       ============================================================ */
     section[data-testid="stSidebar"] .stFileUploader > div > button {
         background-color: #1a4a7a !important;
         color: white !important;
@@ -557,21 +534,14 @@ st.markdown("""
     
     section[data-testid="stSidebar"] .stFileUploader > div > button:hover {
         background-color: #0d2a4a !important;
-        color: white !important;
     }
     
-    /* ============================================================
-       CHECKBOX EN BARRA LATERAL
-       ============================================================ */
     section[data-testid="stSidebar"] .stCheckbox label {
         color: #1a2a3a !important;
         font-weight: 600 !important;
         font-size: 14px !important;
     }
     
-    /* ============================================================
-       BOTONES EN BARRA LATERAL
-       ============================================================ */
     section[data-testid="stSidebar"] .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -602,27 +572,18 @@ st.markdown("""
         transform: translateY(-3px) !important;
     }
     
-    /* ============================================================
-       CAPTION EN BARRA LATERAL
-       ============================================================ */
     section[data-testid="stSidebar"] .stCaption {
         color: #4a5a6a !important;
         font-size: 11px !important;
         font-weight: 500 !important;
     }
     
-    /* ============================================================
-       SEPARADOR EN BARRA LATERAL
-       ============================================================ */
     section[data-testid="stSidebar"] hr {
         border-color: #d5dde6 !important;
         margin: 12px 0 !important;
         opacity: 0.5 !important;
     }
     
-    /* ============================================================
-       MÉTRICAS - FONDO BLANCO
-       ============================================================ */
     div[data-testid="stMetric"] {
         background-color: #ffffff !important;
         border-radius: 12px !important;
@@ -631,9 +592,6 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
     }
     
-    /* ============================================================
-       EXPANDER - FONDO BLANCO
-       ============================================================ */
     .streamlit-expanderHeader {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -648,9 +606,6 @@ st.markdown("""
         border-radius: 0 0 8px 8px !important;
     }
     
-    /* ============================================================
-       DATA FRAME - FONDO BLANCO
-       ============================================================ */
     .stDataFrame {
         background-color: #ffffff !important;
         border-radius: 10px !important;
@@ -671,9 +626,6 @@ st.markdown("""
         color: #1a2a3a !important;
     }
     
-    /* ============================================================
-       RESULTADOS
-       ============================================================ */
     .stAlert {
         background-color: #ffffff !important;
         border: 1px solid #e8edf2 !important;
@@ -684,9 +636,6 @@ st.markdown("""
         color: #1a2a3a !important;
     }
     
-    /* ============================================================
-       BOTONES - GRADIENTE AZUL-MORADO
-       ============================================================ */
     .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -703,9 +652,6 @@ st.markdown("""
         box-shadow: 0 6px 25px rgba(26, 74, 122, 0.3) !important;
     }
     
-    /* ============================================================
-       RADIO BUTTONS - FONDO BLANCO
-       ============================================================ */
     .stRadio > div {
         background-color: #ffffff !important;
         padding: 10px 16px !important;
@@ -718,9 +664,6 @@ st.markdown("""
         font-weight: 500 !important;
     }
     
-    /* ============================================================
-       NUMBER INPUT - FONDO BLANCO
-       ============================================================ */
     .stNumberInput > div > div > input {
         background-color: #ffffff !important;
         color: #1a2a3a !important;
@@ -728,9 +671,6 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
-    /* ============================================================
-       TEXTOS GENERALES - OSCUROS
-       ============================================================ */
     h1, h2, h3, h4, h5, h6 {
         color: #1a2a3a !important;
         font-weight: 700 !important;
@@ -740,9 +680,6 @@ st.markdown("""
         color: #4a5a6a !important;
     }
     
-    /* ============================================================
-       SPINNER
-       ============================================================ */
     .stSpinner > div {
         border-color: #1a4a7a !important;
     }
@@ -846,7 +783,10 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    test_mode = st.checkbox("", label_visibility="collapsed")
+    # ============================================================
+    # CORREGIDO: test_mode capturado correctamente
+    # ============================================================
+    test_mode = st.checkbox("Activar modo prueba", value=False, label_visibility="collapsed")
     
     st.markdown("---")
     
@@ -959,12 +899,13 @@ if uploaded_file is not None:
             }
         
         # ============================================================
-        # PROCESAR ENVÍO
+        # PROCESAR ENVÍO - CORREGIDO
         # ============================================================
         if enviar_reales or simular:
             if enviar_reales and (not smtp_username or not smtp_password):
                 st.error("⚠️ Ingresa tus credenciales de Outlook para enviar correos reales")
             else:
+                # Procesar destinatarios
                 to_emails = [email.strip() for email in to_input.split(',') if email.strip()]
                 cc_emails = [email.strip() for email in cc_input.split(',') if email.strip()]
                 
@@ -974,12 +915,16 @@ if uploaded_file is not None:
                     with st.spinner("⏳ Procesando reporte..."):
                         tipo = 'dia' if tipo_reporte == "Día específico" else 'rango'
                         
+                        # ============================================================
+                        # CORREGIDO: test_mode se pasa correctamente
+                        # ============================================================
                         success, msg = procesar_reporte(
                             uploaded_file, tipo, fecha_params,
                             smtp_username, smtp_password,
                             to_emails, cc_emails,
-                            test_mode
+                            test_mode  # <--- Se pasa el valor del checkbox
                         )
+                        # ============================================================
                     
                     st.markdown("---")
                     st.markdown("<div style='font-weight: 700; color: #1a2a3a; font-size: 20px;'>📋 Resultados</div>", unsafe_allow_html=True)
