@@ -84,7 +84,7 @@ def get_banner_base64():
     return None
 
 # ============================================================
-# FUNCIÓN PARA OBTENER SALUDO CON ZONA HORARIA CORRECTA
+# FUNCIONES DE UTILIDAD
 # ============================================================
 
 def obtener_saludo():
@@ -98,10 +98,6 @@ def obtener_saludo():
 
 def obtener_hora_local():
     return datetime.now(ZONA_HORARIA)
-
-# ============================================================
-# FUNCIONES DE UTILIDAD
-# ============================================================
 
 def parsear_fechas(df):
     columna_fecha = None
@@ -455,49 +451,42 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - MODO CLARO FORZADO (A COMO DE LUGAR)
+# CSS - BARRA LATERAL CLARA FORZADA
 # ============================================================
 
 st.markdown("""
 <style>
     /* ============================================================
-       FORZAR MODO CLARO EN TODOS LOS ELEMENTOS
+       OCULTAR ELEMENTOS
        ============================================================ */
-    
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     
-    /* Fondo de toda la aplicación */
-    .stApp {
-        background-color: #e8edf2 !important;
-    }
-    
-    .stApp > div {
-        background-color: #e8edf2 !important;
-    }
-    
-    .main > div {
-        background-color: #e8edf2 !important;
-    }
-    
-    .block-container {
+    /* ============================================================
+       FONDO GENERAL - CLARO
+       ============================================================ */
+    .stApp, .stApp > div, .main, .main > div, .block-container {
         background-color: #e8edf2 !important;
     }
     
     /* ============================================================
-       BARRA LATERAL - CLARA
+       BARRA LATERAL - CLARA FORZADA
        ============================================================ */
+    
+    /* Contenedor principal de la barra lateral */
     section[data-testid="stSidebar"] {
-        background: #f0f4f8 !important;
+        background-color: #f0f4f8 !important;
+        background-image: none !important;
         border-right: 2px solid #1a4a7a !important;
     }
     
     section[data-testid="stSidebar"] > div {
-        background-color: transparent !important;
+        background-color: #f0f4f8 !important;
+        background-image: none !important;
     }
     
     /* ============================================================
-       TODOS LOS TEXTOS DE LA BARRA LATERAL - OSCUROS
+       TODOS LOS TEXTOS EN LA BARRA LATERAL - OSCUROS
        ============================================================ */
     section[data-testid="stSidebar"] * {
         color: #1a2a3a !important;
@@ -512,12 +501,21 @@ st.markdown("""
     section[data-testid="stSidebar"] span,
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] h4,
+    section[data-testid="stSidebar"] h5,
+    section[data-testid="stSidebar"] h6 {
         color: #1a2a3a !important;
     }
     
+    /* Placeholder de inputs */
+    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
+        color: #8a9bb0 !important;
+        opacity: 0.7 !important;
+    }
+    
     /* ============================================================
-       INPUTS EN BARRA LATERAL - BLANCOS
+       INPUTS EN BARRA LATERAL - BLANCOS CON TEXTO OSCURO
        ============================================================ */
     section[data-testid="stSidebar"] .stTextInput > div > div > input {
         background-color: #ffffff !important;
@@ -527,11 +525,6 @@ st.markdown("""
         padding: 10px 14px !important;
         font-size: 14px !important;
         font-weight: 500 !important;
-    }
-    
-    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
-        color: #8a9bb0 !important;
-        opacity: 0.7 !important;
     }
     
     section[data-testid="stSidebar"] .stTextInput > div > div > input:focus {
@@ -547,6 +540,9 @@ st.markdown("""
         font-size: 14px !important;
     }
     
+    /* ============================================================
+       FILE UPLOADER EN BARRA LATERAL
+       ============================================================ */
     section[data-testid="stSidebar"] .stFileUploader > div > button {
         background-color: #1a4a7a !important;
         color: white !important;
@@ -560,12 +556,18 @@ st.markdown("""
         color: white !important;
     }
     
+    /* ============================================================
+       CHECKBOX EN BARRA LATERAL
+       ============================================================ */
     section[data-testid="stSidebar"] .stCheckbox label {
         color: #1a2a3a !important;
         font-weight: 600 !important;
         font-size: 14px !important;
     }
     
+    /* ============================================================
+       BOTONES EN BARRA LATERAL
+       ============================================================ */
     section[data-testid="stSidebar"] .stButton > button {
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -596,12 +598,18 @@ st.markdown("""
         transform: translateY(-3px) !important;
     }
     
+    /* ============================================================
+       CAPTION EN BARRA LATERAL
+       ============================================================ */
     section[data-testid="stSidebar"] .stCaption {
         color: #4a5a6a !important;
         font-size: 11px !important;
         font-weight: 500 !important;
     }
     
+    /* ============================================================
+       SEPARADOR EN BARRA LATERAL
+       ============================================================ */
     section[data-testid="stSidebar"] hr {
         border-color: #d5dde6 !important;
         margin: 12px 0 !important;
