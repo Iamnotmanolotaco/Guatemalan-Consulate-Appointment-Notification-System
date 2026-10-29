@@ -30,7 +30,7 @@ st.set_page_config(
 SMTP_SERVER = "smtp.office365.com"
 SMTP_PORT = 587
 
-URL_LOGO_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/imagen (8).png"
+URL_LOGO_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/clga.png"
 URL_BANNER_GITHUB = "https://raw.githubusercontent.com/Iamnotmanolotaco/Inmigration-USCIS-Alerts-Automation/main/banner.png"
 
 NOMBRE_EMPRESA = "Community Law Group, PLLC® "
